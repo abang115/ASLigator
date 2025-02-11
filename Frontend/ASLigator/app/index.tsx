@@ -3,15 +3,15 @@ import React, {useState} from 'react'
 import auth from "@react-native-firebase/auth"
 import { useRouter } from 'expo-router'
  
-export default function Index() {
+export default function index() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const register = async () => {
+  const login = async () => {
     if (email && password) {
       try {
-        const response = await auth().createUserWithEmailAndPassword(
+        const response = await auth().signInWithEmailAndPassword(
           email,
           password
         );
@@ -22,43 +22,43 @@ export default function Index() {
   };
 
   return (
-      <KeyboardAvoidingView
-          style={styles.container}
-          behavior='padding'
-      >
-          <Text style={styles.headerText}>Login</Text>
-          <View style={styles.inputContainer}>
-              <TextInput
-                  placeholder="Email"
-                  value={email}
-                  onChangeText={text => setEmail(text)}
-                  style={styles.input}
-              />
-              <TextInput
-                  placeholder="Password"
-                  value={password}
-                  onChangeText={text => setPassword(text)}
-                  style={styles.input}
-                  secureTextEntry
-              />
-          </View>
+    <KeyboardAvoidingView
+        style={styles.container}
+        behavior='padding'
+    >
+        <Text style={styles.headerText}>Login</Text>
+        <View style={styles.inputContainer}>
+            <TextInput
+                placeholder="Email"
+                value={email}
+                onChangeText={text => setEmail(text)}
+                style={styles.input}
+            />
+            <TextInput
+                placeholder="Password"
+                value={password}
+                onChangeText={text => setPassword(text)}
+                style={styles.input}
+                secureTextEntry
+            />
+        </View>
 
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              onPress={() => { }}
-              style={styles.button}
-            >
-              <Text style={styles.buttonText}>Login</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => router.push("/RegisterScreen")}
-              style={[styles.button, styles.buttonOutline]}
-            >
-              <Text style={styles.buttonOutlineText}>Register</Text>
-            </TouchableOpacity>
-          </View>
-      </KeyboardAvoidingView>
-    )
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={() => { }}
+            style={styles.button}
+          >
+          <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push("/RegisterScreen")}
+            style={[styles.button, styles.buttonOutline]}
+          >
+            <Text style={styles.buttonOutlineText}>Register</Text>
+          </TouchableOpacity>
+        </View>
+    </KeyboardAvoidingView>
+  )
 }
 
 const styles = StyleSheet.create({
