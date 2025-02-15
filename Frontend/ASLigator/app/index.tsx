@@ -15,6 +15,9 @@ export default function index() {
           email,
           password
         );
+        if (response.user) {
+          router.push("/HomeScreen")
+        }
       } catch (e) {
         alert("Error!")
       }
@@ -45,7 +48,7 @@ export default function index() {
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            onPress={() => { }}
+            onPress={ login }
             style={styles.button}
           >
           <Text style={styles.buttonText}>Login</Text>
