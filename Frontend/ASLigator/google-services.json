@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "758611024612",
+    "project_id": "asligator",
+    "storage_bucket": "asligator.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:758611024612:android:1f9aade3e564e4551d6af1",
+        "android_client_info": {
+          "package_name": "com.SeniorProject.ASLigator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmpTObSGXWJvggImRZGHFlZWiVeckmAP4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
