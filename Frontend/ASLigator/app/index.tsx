@@ -31,14 +31,16 @@ export default function index() {
     >
         <Text style={styles.headerText}>Login</Text>
         <View style={styles.inputContainer}>
+            <Text style={styles.label}>Email</Text>
             <TextInput
-                placeholder="Email"
+                placeholder="Enter your email"
                 value={email}
                 onChangeText={text => setEmail(text)}
                 style={styles.input}
             />
+            <Text style={styles.label}>Password</Text>
             <TextInput
-                placeholder="Password"
+                placeholder="Enter your password"
                 value={password}
                 onChangeText={text => setPassword(text)}
                 style={styles.input}
@@ -65,6 +67,11 @@ export default function index() {
 }
 
 const styles = StyleSheet.create({
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
   container: {
       flex: 1,
       justifyContent: 'center',
@@ -79,6 +86,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     marginTop: 5,
+    marginBottom: 10,
   },
   buttonContainer: {
     width: "60%",
@@ -110,10 +118,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   headerText: {
-    fontSize: 24,
+    fontSize: 48,
     fontWeight: "bold",
-    alignSelf: "flex-start",
-    marginLeft: "10%",
-    marginBottom: 15, 
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 30, 
   },
 })
