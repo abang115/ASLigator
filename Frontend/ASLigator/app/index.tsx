@@ -1,56 +1,26 @@
 import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native'
-import React, {useState} from 'react'
-import auth from "@react-native-firebase/auth"
+import React from 'react'
 import { useRouter } from 'expo-router'
+import { Ionicons } from '@expo/vector-icons';
  
 export default function index() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-
-  const login = async () => {
-    if (email && password) {
-      try {
-        const response = await auth().signInWithEmailAndPassword(
-          email,
-          password
-        );
-        if (response.user) {
-          router.push("/HomeScreen")
-        }
-      } catch (e) {
-        alert("Error!")
-      }
-    }
-  };
 
   return (
     <KeyboardAvoidingView
         style={styles.container}
         behavior='padding'
     >
-        <Text style={styles.headerText}>Login</Text>
-        <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-                placeholder="Enter your email"
-                value={email}
-                onChangeText={text => setEmail(text)}
-                style={styles.input}
-            />
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-                placeholder="Enter your password"
-                value={password}
-                onChangeText={text => setPassword(text)}
-                style={styles.input}
-                secureTextEntry
-            />
-        </View>
+        <Ionicons name="hand-right-outline" size={100} color="#33418b"/>
+        <Text style={styles.headerText}>ASLigator</Text>
 
+        <Text style={styles.infoText}>
+          ASLigator will enable any user to point their camera at ASL gestures, 
+          translating them into understandable text instantly
+        </Text>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            onPress={ login }
+            onPress={() => router.push("/LoginScreen")}
             style={styles.button}
           >
           <Text style={styles.buttonText}>Login</Text>
@@ -59,7 +29,7 @@ export default function index() {
             onPress={() => router.push("/RegisterScreen")}
             style={[styles.button, styles.buttonOutline]}
           >
-            <Text style={styles.buttonOutlineText}>Register</Text>
+            <Text style={styles.buttonOutlineText}>Create Account</Text>
           </TouchableOpacity>
         </View>
     </KeyboardAvoidingView>
@@ -67,26 +37,10 @@ export default function index() {
 }
 
 const styles = StyleSheet.create({
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
   container: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center'
-  },
-  inputContainer: {
-      width: '80%',
-  },
-  input: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    marginTop: 5,
-    marginBottom: 10,
   },
   buttonContainer: {
     width: "60%",
@@ -95,7 +49,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   button: {
-    backgroundColor: "#0021A5",
+    backgroundColor: "#33418b",
     alignItems: "center",
     width: "100%",
     padding: 15,
@@ -103,8 +57,8 @@ const styles = StyleSheet.create({
   },
   buttonOutline: {
     backgroundColor: "#fff",
-    marginTop: 5,
-    borderColor: '#0021A5',
+    marginTop: 20,
+    borderColor: '#33418b',
     borderWidth: 2,
   },
   buttonText: {
@@ -113,15 +67,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonOutlineText: {
-    color: '#0021A5',
+    color: '#33418b',
     fontWeight: '700',
     fontSize: 16,
   },
   headerText: {
-    fontSize: 48,
+    fontSize: 40,
     fontWeight: "bold",
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30, 
+    marginBottom: 50, 
+    top: 30,
+    color: "#33418b"
+  },
+  infoText: {
+    fontSize: 20,
+    marginLeft: 20,
+    marginRight: 20,
+    textAlign: 'center'
   },
 })

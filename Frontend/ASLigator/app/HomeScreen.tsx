@@ -1,8 +1,11 @@
 import { CameraView, CameraType, useCameraPermissions, useMicrophonePermissions } from 'expo-camera';
 import { useState, useRef } from 'react';
 import { Button, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router'
 
 export default function HomeScreen() {
+  const router = useRouter()
   const [facing, setFacing] = useState<CameraType>('back');
   const [camPermission, requestCamPermission] = useCameraPermissions();
   const [micPermission, requestMicPermission] = useMicrophonePermissions();
@@ -21,10 +24,6 @@ export default function HomeScreen() {
         <Button onPress={requestMicPermission} title="Grant Microphone Permission" />
       </View>
     );
-  }
-
-  function toggleCameraFacing() {
-    setFacing(current => (current === 'back' ? 'front' : 'back'));
   }
 
   const startRecording = async () => {
@@ -55,6 +54,18 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity 
+      style={styles.settingsButton}
+      onPress={() => router.push("/SettingsScreen")}
+      >
+        <Ionicons name="settings" size={30} color="white"/>
+      </TouchableOpacity>
+      <TouchableOpacity 
+      style={styles.profileButton}
+      onPress={() => router.push("/ProfileScreen")}
+      >
+      <Ionicons name="person" size={30} color="white"/>
+      </TouchableOpacity>
       <CameraView
         mode="video"
         ref={cameraRef} 
@@ -99,6 +110,7 @@ const styles = StyleSheet.create({
     height: '70%',
     borderRadius: 20,
     overflow: 'hidden',
+    marginTop: 55,
   },
   buttonContainer: {
     flex: 1,
@@ -129,5 +141,29 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: "transparent",
     marginBottom: 20,
+  },
+  settingsButton: {
+    display: 'flex',
+    position: 'absolute',
+    top: 0,
+    left: 15,
+    backgroundColor: "#0021A5",
+    borderRadius: 25,
+    width: 50,
+    height: 50, 
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  profileButton: {
+    display: 'flex',
+    position: 'absolute',
+    top: 0,
+    right: 15,
+    backgroundColor: "#0021A5",
+    borderRadius: 25,
+    width: 50,
+    height: 50, 
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 });

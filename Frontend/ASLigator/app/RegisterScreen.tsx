@@ -2,7 +2,9 @@ import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, TextInp
 import React, {useState} from 'react'
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
 import db from "@react-native-firebase/database"
+import firestore from "@react-native-firebase/firestore"
 import { useRouter } from 'expo-router'
+import { Ionicons } from '@expo/vector-icons';
 
 export default function RegisterScreen() {
   const router = useRouter()
@@ -10,24 +12,37 @@ export default function RegisterScreen() {
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
 
   const createProfile = async (response: FirebaseAuthTypes.UserCredential) => {
     db().ref(`/users/${response.user.uid}`).set({ firstName, lastName });
   };
 
   const register = async () => {
-    if (email && password) {
-      try {
-        const response = await auth().createUserWithEmailAndPassword(
-          email,
-          password
-        );
-        if (response.user) {
-          await createProfile(response)
-          router.push("/HomeScreen")
+    if(password != confirmPassword) {
+      alert("Passwords do not match!")
+    }
+    else {
+      if (email && password) {
+        try {
+          const response = await auth().createUserWithEmailAndPassword(
+            email,
+            password
+          );
+          if (response.user) {
+            await createProfile(response)
+            await firestore().collection("users").doc(response.user.uid).set({
+              firstName: firstName,
+              lastName: lastName,
+              email: email,
+              profilePicture: "",
+              createdAt: firestore.FieldValue.serverTimestamp(),
+            });
+            router.push("/HomeScreen")
+          }
+        } catch (e) {
+          alert("There was an error creating your account.")
         }
-      } catch (e) {
-        alert("Error!")
       }
     }
   };
@@ -37,47 +52,63 @@ export default function RegisterScreen() {
         style={styles.container}
         behavior='padding'
     >
-        <Text style={styles.headerText}>Register</Text>
-        <View style={styles.inputContainer}>
-            <Text style={styles.label}>First Name</Text>
-            <TextInput
-                placeholder="Ex: Jane"
-                value={firstName}
-                onChangeText={text => setFirstName(text)}
-                style={styles.input}
-            />
-            <Text style={styles.label}>Last Name</Text>
-            <TextInput
-                placeholder="Ex: Doe"
-                value={lastName}
-                onChangeText={text => setLastName(text)}
-                style={styles.input}
-            />
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-                placeholder="janedoe@email.com"
-                value={email}
-                onChangeText={text => setEmail(text)}
-                style={styles.input}
-            />
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-                placeholder="Minimum 6 characters"
-                value={password}
-                onChangeText={text => setPassword(text)}
-                style={styles.input}
-                secureTextEntry
-            />
-        </View>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={30} color="#33418b" />
+      </TouchableOpacity>
+      <Text style={styles.headerText}>Register</Text>
+      <View style={styles.inputContainer}>
+          <Text style={styles.label}>First Name</Text>
+          <TextInput
+              placeholder="Ex: Jane"
+              value={firstName}
+              onChangeText={text => setFirstName(text)}
+              style={styles.input}
+          />
+          <Text style={styles.label}>Last Name</Text>
+          <TextInput
+              placeholder="Ex: Doe"
+              value={lastName}
+              onChangeText={text => setLastName(text)}
+              style={styles.input}
+          />
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+              placeholder="janedoe@email.com"
+              value={email}
+              onChangeText={text => setEmail(text)}
+              style={styles.input}
+          />
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+              placeholder="Minimum 6 characters"
+              value={password}
+              onChangeText={text => setPassword(text)}
+              style={styles.input}
+              secureTextEntry
+          />
+          <Text style={styles.label}>Confirm Password</Text>
+          <TextInput
+              placeholder="Password must match"
+              value={confirmPassword}
+              onChangeText={text => setConfirmPassword(text)}
+              style={styles.input}
+              secureTextEntry
+          />
+      </View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={ register }
-            style={styles.button}
-          >
-          <Text style={styles.buttonText}>Register</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          onPress={ register }
+          style={styles.button}          >
+        <Text style={styles.buttonText}>Register</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.loginContainer}>
+      <Text style={styles.loginText}>Already have an account? </Text>
+        <TouchableOpacity onPress={() => router.push("/LoginScreen")}>
+          <Text style={styles.loginLink}>Log In!</Text>
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
   )
 }
@@ -138,5 +169,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 30, 
+  },
+  backButton: {
+    position: "absolute",
+    top: 20, 
+    left: 20,
+    zIndex: 10,
+  },
+  loginContainer: {
+    flexDirection: "row",
+    marginTop: 20,
+    alignItems: "center",
+  },
+  loginText: {
+    fontSize: 14,
+    color: "gray",
+  },
+  loginLink: {
+    fontSize: 14,
+    color: "#33418b",
+    fontWeight: "bold",
   },
 })
