@@ -59,10 +59,10 @@ OUTPUT_DATA_DIR = os.path.join(os.getcwd(), OUTPUT_FOLDER_NAME)
 signs = np.array([[chr(ascii_val + 97)] for ascii_val in range(26)])
 
 # Number of videos to capture
-num_videos = 20
+num_videos = 30
 
 # Number of frames in each video
-num_frames = 30
+num_frames = 40
 
 for sign in signs:
     print(f'Collecting data for sign: {sign[0]}')
