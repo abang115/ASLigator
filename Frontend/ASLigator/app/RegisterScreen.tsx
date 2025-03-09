@@ -39,26 +39,30 @@ export default function RegisterScreen() {
     >
         <Text style={styles.headerText}>Register</Text>
         <View style={styles.inputContainer}>
+            <Text style={styles.label}>First Name</Text>
             <TextInput
-                placeholder="First Name"
+                placeholder="Ex: Jane"
                 value={firstName}
                 onChangeText={text => setFirstName(text)}
                 style={styles.input}
             />
+            <Text style={styles.label}>Last Name</Text>
             <TextInput
-                placeholder="Last Name"
+                placeholder="Ex: Doe"
                 value={lastName}
                 onChangeText={text => setLastName(text)}
                 style={styles.input}
             />
+            <Text style={styles.label}>Email</Text>
             <TextInput
-                placeholder="Email"
+                placeholder="janedoe@email.com"
                 value={email}
                 onChangeText={text => setEmail(text)}
                 style={styles.input}
             />
+            <Text style={styles.label}>Password</Text>
             <TextInput
-                placeholder="Password"
+                placeholder="Minimum 6 characters"
                 value={password}
                 onChangeText={text => setPassword(text)}
                 style={styles.input}
@@ -79,6 +83,11 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
   container: {
       flex: 1,
       justifyContent: 'center',
@@ -92,7 +101,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: "#fff",
     borderRadius: 10,
-    marginBottom: 40,
+    marginBottom: 20,
   },
   buttonContainer: {
     width: "60%",
@@ -124,10 +133,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   headerText: {
-    fontSize: 24,
+    fontSize: 48,
     fontWeight: "bold",
-    alignSelf: "flex-start",
-    marginLeft: "10%",
-    marginBottom: 15, 
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 30, 
   },
 })

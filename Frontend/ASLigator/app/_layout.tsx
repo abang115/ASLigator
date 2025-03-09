@@ -13,6 +13,11 @@ export default function RootLayout() {
       headerStyle: { backgroundColor: "#FA4616" }, 
       headerTintColor: "white",
       }} />
+      <Stack.Screen name="HomeScreen" options={{ 
+      title: "Home",
+      headerStyle: { backgroundColor: "#FA4616" }, 
+      headerTintColor: "white",
+      }} />
   </Stack> 
   );
 }
