@@ -14,7 +14,7 @@ def extract_signs(DATA_PATH):
     for sign in os.listdir(DATA_PATH):
         sign_mapping[sign] = count
         count += 1
-
+        print('Working on sign ' + sign)
         # Video Directory
         vid_dir = os.path.join(DATA_PATH, sign)
         # Loop through each video
@@ -30,6 +30,8 @@ def extract_signs(DATA_PATH):
                 window.append(res)
             # Append full video to array
             target.append(sign_mapping[sign])
+            print(f'{vid} ') 
+            print(str(np.array(window).shape))
             dataset.append(window)
             
     return sign_mapping, dataset, target
@@ -41,6 +43,7 @@ OUTPUT_PATH = os.path.join(os.getcwd(), f'Preprocessed_{DATA_DIR}')
 if not os.path.exists(OUTPUT_PATH):
     os.makedirs(OUTPUT_PATH)
 
+print('Extracting data!')
 sign_mapping, dataset, target = extract_signs(DATA_PATH)
 
 # Export signs to json file
