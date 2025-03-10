@@ -22,29 +22,46 @@ def draw_landmarks(image, results):
     mp_drawings.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
                                mp_drawings.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2),
                                mp_drawings.DrawingSpec(color=(0,255,0), thickness=2, circle_radius=1))
+    # Draw face connections
+    mp_drawings.draw_landmarks(image, results.face_landmarks, mp_holistic.FACEMESH_TESSELATION,
+                               mp_drawings.DrawingSpec(color=(255,0,255), thickness=1, circle_radius=1),
+                               mp_drawings.DrawingSpec(color=(0,255,0), thickness=1, circle_radius=1))
+    # Draw pose connections
+    mp_drawings.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS,
+                               mp_drawings.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2),
+                               mp_drawings.DrawingSpec(color=(0,255,0), thickness=2, circle_radius=1))
+
 
 def extract_landmarks(results):
-    left_lm, right_lm = [],[]
+    left_lm, right_lm, face_lm, pose_lm = [],[],[],[]
     # Grab coords for each left hand landmark
     if results.left_hand_landmarks:
         left_lm = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten()
     else:
         left_lm = np.zeros(21*3)
-    
     # Right hand landmark
     if results.right_hand_landmarks:
         right_lm = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten()
     else:
         right_lm = np.zeros(21*3)
-    
-    return np.concatenate([left_lm, right_lm])
+    # Face landmark
+    if results.face_landmarks:
+        face_lm = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten()
+    else:
+        face_lm = np.zeros(478*3)
+    # Pose Landmark
+    if results.pose_landmarks:
+        pose_lm = np.array([[res.x, res.y, res.z] for res in results.pose_landmarks.landmark]).flatten()
+    else:
+        pose_lm = np.zeros(33*3)
+    return np.concatenate([left_lm, right_lm, face_lm, pose_lm])
 
 
 # Intialize mediapipe tools
 mp_holistic = mp.solutions.holistic
 mp_drawings = mp.solutions.drawing_utils
 holistic = mp_holistic.Holistic(
-    min_detection_confidence=0.7, 
+    min_detection_confidence=0.5, 
     min_tracking_confidence=0.5
     )
 
@@ -62,7 +79,7 @@ signs = np.array([[chr(ascii_val + 97)] for ascii_val in range(26)])
 num_videos = 30
 
 # Number of frames in each video
-num_frames = 40
+num_frames = 30
 
 for sign in signs:
     print(f'Collecting data for sign: {sign[0]}')
@@ -120,7 +137,7 @@ for sign in signs:
             np_path = os.path.join(data_path, str(n))
             cv2.imshow('Collecting data', image)
             np.save(np_path, lm)
-
+            print(lm.shape)
             # Stop webcam if q or exit button is pressed
             if cv2.waitKey(1) == ord('q'):
                 break
