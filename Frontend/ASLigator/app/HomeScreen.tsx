@@ -1,8 +1,9 @@
-import { CameraView, CameraType, useCameraPermissions, useMicrophonePermissions } from 'expo-camera';
-import { useState, useRef } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { CameraView, CameraType, useCameraPermissions, useMicrophonePermissions } from 'expo-camera'
+import { useState, useRef } from 'react'
+import { Button, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
+import axios from 'axios'
 
 export default function HomeScreen() {
   const router = useRouter()
@@ -26,6 +27,34 @@ export default function HomeScreen() {
     );
   }
 
+  const uploadVideo = async (videoUri: string) => {
+    try {
+      let formData = new FormData();
+
+      const uriParts = videoUri.split(".");
+      const fileType = uriParts[uriParts.length - 1];
+
+      formData.append("video", {
+        uri: videoUri,
+        type: `video/${fileType}`,
+        name: `video.${fileType}`,
+      } as any);
+  
+      const API_URL = process.env.EXPO_PUBLIC_API_URL
+      const res = await axios.post(`${API_URL}/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      if (res.data.message) {
+        alert('Video uploaded successfully!');
+      }
+    } catch (error) {
+      console.error('Error uploading video:', error);
+    }
+  };
+
   const startRecording = async () => {
     if (cameraRef.current) {
       try {
@@ -33,6 +62,7 @@ export default function HomeScreen() {
         const video = await cameraRef.current.recordAsync();
         if(video) {
           console.log("currently recording", video.uri)
+          uploadVideo(video.uri)
         }
       } catch (error) {
         console.error("Error starting recording:", error);
@@ -45,10 +75,11 @@ export default function HomeScreen() {
       try {
         cameraRef.current.stopRecording();
         console.log("stopped recording")
+        setIsRecording(false);
+
       } catch (error) {
         console.error("Error stopping recording:", error);
       }
-      setIsRecording(false);
     }
   };
 
