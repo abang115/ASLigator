@@ -165,7 +165,8 @@ def gather_vid_lm(vid_dir, output_folder, model):
     cam.release()
     cv2.destroyAllWindows()  
     
-    output_folder    
+    # Output data
+    output_data(output_folder, training_array, target, mapping)    
 
 
 if __name__ == '__main__':
