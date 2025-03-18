@@ -1,6 +1,7 @@
 import os
 import time
 import cv2
+import json
 import mediapipe as mp 
 import numpy as np
 
@@ -56,18 +57,59 @@ def extract_landmarks(results):
         pose_lm = np.zeros(33*3)
     return np.concatenate([left_lm, right_lm, face_lm, pose_lm])
 
-def gather_vid_lm(vid_dir, model):
+def output_data(output_folder, training_array, target, mapping):
+    mapping_file = 'mapping.json'
+    target_file = 'target.json'
+    npy_file = 'full_dataset'
+    
+    # Try exporting mapping to json
+    try:
+        with open(os.path.join(output_folder, mapping_file), 'w') as f:
+            json.dump(mapping, f, indent=4)
+            f.close()
+    except Exception as e:
+        print('Error exporting:', e)
+    # Try exporting target to json
+    try:
+        with open(os.path.join(output_folder, target_file), 'w') as f:
+            json.dump(target, f, indent=4)
+            f.close()
+    except Exception as e:
+        print('Error exporting:', e)
+    # Try exporting npy file  
+    try:
+        np.save(os.path.join(output_folder, npy_file), training_array)
+    except Exception as e:
+        print('Error exporting:', e)
+
+
+def gather_vid_lm(vid_dir, output_folder, model):
     exit_flag = False
+    
+    # Classes and mapping
+    target = []
+    mapping = {}
+    count = 0
+    
+    # Landmark array
+    training_array = []
+    
     # Loop through every class in this directory
     for sign in os.listdir(vid_dir):
         VID_PATH = os.path.join(vid_dir, sign)
         # print(VID_PATH)
         
+        # Map the current sign and increment index
+        mapping[sign] = count
+        count += 1
+        
         # Go thorugh each sign and get videos
         for video in os.listdir(VID_PATH):
             mp4_file = os.path.join(VID_PATH, video)
-            
             print(f'Capturing data for video: {video}')
+            
+            # Add the current target to the array
+            target.append(mapping[sign])
             
             # Open capture for that video
             cam = cv2.VideoCapture(mp4_file)
@@ -78,6 +120,8 @@ def gather_vid_lm(vid_dir, model):
             
             #start_time = time.time()
             
+            frame_landmarks = []
+            
             while num_frames != 40:
                 # Skip if file cannot be read
                 ret, frame = cam.read()
@@ -87,13 +131,20 @@ def gather_vid_lm(vid_dir, model):
             
                 image, result = mp_detect(frame, model)
                 draw_landmarks(image, result)
+                
+                # Append the landmarks in frame to the array
+                frame_landmarks.append(extract_landmarks(result))
+                
                 cv2.imshow('Collecting data', image)
-            
+
                 if cv2.waitKey(1) == ord('q'):
                     exit_vid_capture_flag = True
                     exit_flag = True
                     break
                 num_frames += 1
+            
+            training_array.append(frame_landmarks)
+            # print(training_array)
             
             #end_time = time.time()
             #duration = end_time - start_time
@@ -112,7 +163,9 @@ def gather_vid_lm(vid_dir, model):
             break
     cv2.waitKey(10)
     cam.release()
-    cv2.destroyAllWindows()      
+    cv2.destroyAllWindows()  
+    
+    output_folder    
 
 
 if __name__ == '__main__':
@@ -126,5 +179,10 @@ if __name__ == '__main__':
     
     # Path to training videos
     VID_FOLDER = 'train_video_folder'
+    OUTPUT_FOLDER = f'Processed_{VID_FOLDER}'
+    
+    # Create output folder
+    if not os.path.exists(OUTPUT_FOLDER):
+        os.makedirs(OUTPUT_FOLDER)
     print(os.getcwd())
-    gather_vid_lm(VID_FOLDER, holistic)
+    gather_vid_lm(VID_FOLDER, OUTPUT_FOLDER, holistic)
