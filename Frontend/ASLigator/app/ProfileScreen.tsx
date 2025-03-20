@@ -73,6 +73,15 @@ export default function ProfileScreen() {
     }
   };
 
+  const signOut= async () => {
+    try {
+      await auth().signOut()
+      router.push("/")
+    }
+    catch (e) {
+      alert("Error, could not sign out!")
+    }
+  };
   
   return (
      <KeyboardAvoidingView
@@ -101,7 +110,7 @@ export default function ProfileScreen() {
       <Text style={styles.profileText}>First Name: {userData.firstName}</Text>
       <Text style={styles.profileText}>Last Name: {userData.lastName}</Text>
       <Text style={styles.profileText}>Email: {userData.email}</Text>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity onPress={signOut} style={styles.button}>
         <Text style={styles.buttonText}>Sign Out</Text>
       </TouchableOpacity>
      </KeyboardAvoidingView>
