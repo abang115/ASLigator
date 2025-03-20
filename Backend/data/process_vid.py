@@ -32,35 +32,29 @@ def draw_landmarks(image, results):
                                mp_drawings.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2),
                                mp_drawings.DrawingSpec(color=(0,255,0), thickness=2, circle_radius=1))
 
-
 def extract_landmarks(results):
     left_lm, right_lm, face_lm, pose_lm = [],[],[],[]
     # Grab coords for each left hand landmark
-    if results.left_hand_landmarks:
-        left_lm = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten()
-    else:
-        left_lm = np.zeros(21*3)
+    left_lm = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
     # Right hand landmark
-    if results.right_hand_landmarks:
-        right_lm = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten()
-    else:
-        right_lm = np.zeros(21*3)
+    right_lm = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
     # Face landmark
-    if results.face_landmarks:
-        face_lm = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten()
-    else:
-        face_lm = np.zeros(478*3)
+    face_lm = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten() if results.face_landmarks else np.zeros(468*3)
     # Pose Landmark
-    if results.pose_landmarks:
-        pose_lm = np.array([[res.x, res.y, res.z] for res in results.pose_landmarks.landmark]).flatten()
-    else:
-        pose_lm = np.zeros(33*3)
-    return np.concatenate([left_lm, right_lm, face_lm, pose_lm])
+    pose_lm = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
+    return np.concatenate([face_lm, pose_lm, right_lm, left_lm])
 
-def output_data(output_folder, training_array, target, mapping):
+def create_output_folder(output_folder, input_folder):
+    # loops through the video data and makes directory
+    for sign in os.listdir(input_folder):
+        vid_dir = os.path.join(input_folder, sign)
+        output_vid_dir = os.path.join(output_folder, sign)
+        for vid in os.listdir(vid_dir):
+            os.makedirs(output_vid_dir, exist_ok=True)
+
+def output_data(output_folder, target, mapping):
     mapping_file = 'mapping.json'
     target_file = 'target.json'
-    npy_file = 'full_dataset'
     
     # Try exporting mapping to json
     try:
@@ -76,14 +70,8 @@ def output_data(output_folder, training_array, target, mapping):
             f.close()
     except Exception as e:
         print('Error exporting:', e)
-    # Try exporting npy file  
-    try:
-        np.save(os.path.join(output_folder, npy_file), training_array)
-    except Exception as e:
-        print('Error exporting:', e)
 
-
-def gather_vid_lm(vid_dir, output_folder, model):
+def gather_vid_lm(vid_dir, JSON_folder, npy_folder, model):
     exit_flag = False
     
     # Classes and mapping
@@ -91,13 +79,10 @@ def gather_vid_lm(vid_dir, output_folder, model):
     mapping = {}
     count = 0
     
-    # Landmark array
-    training_array = []
-    
     # Loop through every class in this directory
     for sign in os.listdir(vid_dir):
         VID_PATH = os.path.join(vid_dir, sign)
-        # print(VID_PATH)
+        OUTPUT_SIGN_PATH = os.path.join(npy_folder, sign)
         
         # Map the current sign and increment index
         mapping[sign] = count
@@ -106,16 +91,17 @@ def gather_vid_lm(vid_dir, output_folder, model):
         # Go thorugh each sign and get videos
         for video in os.listdir(VID_PATH):
             mp4_file = os.path.join(VID_PATH, video)
-            print(f'Capturing data for video: {video}')
             
-            # Add the current target to the array
-            target.append(mapping[sign])
+            # Split name and file extension
+            name, ext = os.path.splitext(video)
+            OUTPUT_SIGN_VIDEO_PATH = os.path.join(OUTPUT_SIGN_PATH, name)
+            
+            print(f'Capturing data for video: {video}')
             
             # Open capture for that video
             cam = cv2.VideoCapture(mp4_file)
             
             num_frames = 0
-            
             exit_vid_capture_flag = False
             
             #start_time = time.time()
@@ -143,8 +129,24 @@ def gather_vid_lm(vid_dir, output_folder, model):
                     break
                 num_frames += 1
             
-            training_array.append(frame_landmarks)
-            # print(training_array)
+            # Check shape of output, if it's not expected throw it out
+            try:
+                if np.array(frame_landmarks).shape != (40, 1662):
+                    print('Error: Shape not (40, 1662)')
+                    continue
+            except Exception as e:
+                print(f'Error: {video} due to {e}')
+                # print(frame_landmarks)
+                continue
+            
+            # Add the current target to the array
+            target.append(mapping[sign])
+            
+            # Try saving npy
+            try:
+                np.save(OUTPUT_SIGN_VIDEO_PATH, frame_landmarks)
+            except Exception as e:
+                print(f'Error exporting to npy: {e}')
             
             #end_time = time.time()
             #duration = end_time - start_time
@@ -152,21 +154,19 @@ def gather_vid_lm(vid_dir, output_folder, model):
             
             if exit_vid_capture_flag:
                 break
-            # cv2.waitKey(10)
-            # cam.release()
-            # cv2.destroyAllWindows()
             
         if exit_flag:
             cv2.waitKey(10)
             cam.release()
             cv2.destroyAllWindows()
             break
+        
     cv2.waitKey(10)
     cam.release()
     cv2.destroyAllWindows()  
     
     # Output data
-    output_data(output_folder, training_array, target, mapping)    
+    output_data(JSON_folder, target, mapping)    
 
 
 if __name__ == '__main__':
@@ -180,10 +180,16 @@ if __name__ == '__main__':
     
     # Path to training videos
     VID_FOLDER = 'train_video_folder'
-    OUTPUT_FOLDER = f'Processed_{VID_FOLDER}'
     
-    # Create output folder
-    if not os.path.exists(OUTPUT_FOLDER):
-        os.makedirs(OUTPUT_FOLDER)
+    # Path to output folders
+    OUTPUT_JSON_FOLDER = F'Processed_JSON_{VID_FOLDER}'
+    OUTPUT_NPY_FOLDER = f'Processed_NPY_{VID_FOLDER}'
+    
+    # Create output folders
+    os.makedirs(OUTPUT_JSON_FOLDER, exist_ok=True)
+    
+    # Npy data folders
+    create_output_folder(OUTPUT_NPY_FOLDER, VID_FOLDER)
+    
     print(os.getcwd())
-    gather_vid_lm(VID_FOLDER, OUTPUT_FOLDER, holistic)
+    gather_vid_lm(VID_FOLDER, OUTPUT_JSON_FOLDER, OUTPUT_NPY_FOLDER, holistic)
