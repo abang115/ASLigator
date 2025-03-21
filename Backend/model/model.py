@@ -1,5 +1,6 @@
 import os
 import json
+import joblib
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -104,7 +105,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle
 
 # Fit based on training dataset
 model = create_simple_model()
-fit_model(model, X_train, y_train, 10)
+fit_model(model, X_train, y_train, 20)
 
 # Predict test
 res = model.predict(X_test)
@@ -116,6 +117,11 @@ compare_results(actions, res, y_test)
 test_loss, test_acc = model.evaluate(X_test, y_test)
 print(f"test acc: {test_acc*100:.4f}%")
 
+# Save scaler data for detection
+print('Saving scaling data to .save file')
+joblib.dump(scaler, 'scaler.save')
+
 # Save model to keras file
+print('Saving model to .keras file')
 model.save('lstm_model.keras')
 del model
