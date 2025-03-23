@@ -19,15 +19,21 @@ def download_and_trim_videos(json_file_path, output_folder, start_index=0, end_i
     with open(json_file_path, 'r') as f:
         data = json.load(f)
     
-    if end_index is None:
+    if end_index is None or end_index > len(data):
         end_index = len(data)
-    else:
-        end_index = min(end_index, len(data))
     
-    for item in data[start_index:end_index]:
+    data_range = data[start_index:end_index]
+    
+    
+    
+    for idx, item in enumerate(data_range):
+        curr_idx = start_index + idx
+        
         url = item.get('url', '')
+        
         if not url.startswith('http'):
             url = 'https://' + url
+            
         clean_text = str(item.get('clean_text', 'video'))
         vid_text = str(item.get('file', 'video'))
         full_video_path = os.path.join(output_folder, vid_text + '_full.mp4')
@@ -79,14 +85,14 @@ def download_and_trim_videos(json_file_path, output_folder, start_index=0, end_i
                 os.makedirs(class_dir, exist_ok=True)
                 
                 print(f'downloading to: {class_dir}')
-                stream.download(output_path=class_dir, filename=clean_text + '_full.mp4')     
+                stream.download(output_path=output_folder, filename=vid_text + '_full.mp4')     
             except Exception as e:
                 print(f"Error downloading {clean_text}: {e}")
                 continue
         try:
             start_time = float(item.get('start_time', 0))
             end_time = float(item.get('end_time', 0))
-            if end_time <= start_time or (end_time - start_time) < float(2):
+            if end_time <= start_time:
                 # print(f"Skipping {file_name}: Invalid time range.")
                 os.remove(full_video_path)
                 continue
@@ -108,7 +114,8 @@ def download_and_trim_videos(json_file_path, output_folder, start_index=0, end_i
             print(f"Error trimming {clean_text}: {e}")
             continue
         
-        next_url = data[idx + 1].get('url','') if idx + 1 < len(data) else None
+        next_item = data[curr_idx + 1] if curr_idx + 1 < len(data) else None
+        next_url = next_item.get('url', '') if next_item else None
         if not next_url.startswith('http'):
             next_url = 'https://' + next_url
         if next_url != url:
