@@ -1,5 +1,5 @@
-import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native'
-import { useForm, Controller } from "react-hook-form";
+import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { useForm } from "react-hook-form";
 import React from 'react'
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
 import db from "@react-native-firebase/database"
@@ -18,7 +18,7 @@ interface FormData {
 
 export default function RegisterScreen() {
   const router = useRouter()
-  const { control, handleSubmit, formState: { errors }, watch } = useForm<FormData>({
+  const { control, handleSubmit, watch } = useForm<FormData>({
     defaultValues: {
       firstName: "",
       lastName: "",

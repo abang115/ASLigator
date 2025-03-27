@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, Switch} from 'react-native'
+import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, {useState} from 'react'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';

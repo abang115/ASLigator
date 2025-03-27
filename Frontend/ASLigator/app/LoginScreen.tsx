@@ -1,6 +1,6 @@
-import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native'
+import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
-import { useForm, Controller } from "react-hook-form";
+import { useForm} from "react-hook-form";
 import auth from "@react-native-firebase/auth"
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';
@@ -13,7 +13,7 @@ interface FormData {
  
 export default function LoginScreen() {
   const router = useRouter()
-  const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const { control, handleSubmit } = useForm<FormData>({
       defaultValues: {
         email: "",
         password: "",
