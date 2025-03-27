@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native'
+import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';
@@ -7,40 +7,32 @@ export default function index() {
   const router = useRouter()
 
   return (
-    <KeyboardAvoidingView
-        style={styles.container}
-        behavior='padding'
-    >
-        <Ionicons name="hand-right-outline" size={100} color="#33418b"/>
-        <Text style={styles.headerText}>ASLigator</Text>
+    <KeyboardAvoidingView style={styles.container} behavior='padding'>
+      <Ionicons name="hand-right-outline" size={100} color="#33418b"/>
+      <Text style={styles.headerText}>ASLigator</Text>
 
-        <Text style={styles.infoText}>
-          ASLigator will enable any user to point their camera at ASL gestures, 
-          translating them into understandable text instantly
-        </Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={() => router.push("/LoginScreen")}
-            style={styles.button}
-          >
+      <Text style={styles.infoText}>
+        ASLigator will enable any user to point their camera at ASL gestures, 
+        translating them into understandable text instantly
+      </Text>
+      
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={() => router.push("/LoginScreen")} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => router.push("/RegisterScreen")}
-            style={[styles.button, styles.buttonOutline]}
-          >
-            <Text style={styles.buttonOutlineText}>Create Account</Text>
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/RegisterScreen")} style={[styles.button, styles.buttonOutline]}>
+          <Text style={styles.buttonOutlineText}>Create Account</Text>
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center'
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonContainer: {
     width: "60%",

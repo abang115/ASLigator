@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, Alert, Image, Button} from 'react-native'
+import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, Alert, Image} from 'react-native'
 import React, {useState, useEffect} from 'react'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';
@@ -84,15 +84,12 @@ export default function ProfileScreen() {
   };
   
   return (
-     <KeyboardAvoidingView
-         style={styles.container}
-         behavior='padding'
-     >
-         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-             <Ionicons name="arrow-back" size={30} color="#33418b" />
-         </TouchableOpacity>
+     <KeyboardAvoidingView style={styles.container} behavior='padding'>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+           <Ionicons name="arrow-back" size={30} color="#33418b" />
+        </TouchableOpacity>
 
-         <TouchableOpacity onPress={pickImage} style={styles.imageWrapper}>
+      <TouchableOpacity onPress={pickImage} style={styles.imageWrapper}>
         <View style={styles.imageContainer}>
           {image ? (
             <Image source={{ uri: image }} style={styles.profileImage} />

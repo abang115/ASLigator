@@ -2,34 +2,24 @@ import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View, Switch}
 import React, {useState} from 'react'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';
+import ToggleSwitch from '@/components/ToggleSwitch';
  
 export default function SettingsScreen() {
   const router = useRouter()
-  const [isEnabled, setIsEnabled] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+  const toggleDarkMode = () => setIsDarkMode((previousState) => !previousState);
 
   return (
-     <KeyboardAvoidingView
-         style={styles.container}
-         behavior='padding'
-     >
-         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-             <Ionicons name="arrow-back" size={30} color="#33418b" />
-         </TouchableOpacity>
-         <View style={styles.settingsButton}>
-            <Ionicons name="settings" size={100} color="white"/>
-         </View>
-         <Text style={styles.headerText}>Settings</Text>
-         <View style={styles.toggleContainer}>
-            <Switch
-                trackColor={{ false: "#767577", true: "#33418b" }}
-                thumbColor={isEnabled ? "#ffffff" : "#f4f3f4"}
-                onValueChange={toggleSwitch}
-                value={isEnabled}
-            />
-            <Text>Dark Mode</Text>
-         </View>
+    <KeyboardAvoidingView style={styles.container} behavior='padding'>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={30} color="#33418b" />
+        </TouchableOpacity>
+        <View style={styles.settingsButton}>
+          <Ionicons name="settings" size={100} color="white"/>
+        </View>
+        <Text style={styles.headerText}>Settings</Text>
+        <ToggleSwitch isToggled={isDarkMode} toggleItem={toggleDarkMode} toggleLabel='Dark Mode'/> 
      </KeyboardAvoidingView>
    )
  }

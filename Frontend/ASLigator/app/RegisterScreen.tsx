@@ -6,6 +6,7 @@ import db from "@react-native-firebase/database"
 import firestore from "@react-native-firebase/firestore"
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';
+import InputField from '@/components/InputField';
 
 interface FormData {
   firstName: string;
@@ -73,105 +74,35 @@ export default function RegisterScreen() {
       </TouchableOpacity>
       <Text style={styles.headerText}>Register</Text>
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>First Name</Text>
-        <Controller
-          control={control}
-          name="firstName"
+        <InputField control={control} name="firstName" label="First Name" placeholder="Ex: Jane"
           rules={{ required: "First name is required." }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[styles.input, errors.firstName && styles.errorInput]}
-              placeholder="Ex: Jane"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
         />
-        {errors.firstName && <Text style={styles.errorText}>{errors.firstName.message}</Text>}
 
-        <Text style={styles.label}>Last Name</Text>
-        <Controller
-          control={control}
-          name="lastName"
+        <InputField control={control} name="lastName" label="Last Name" placeholder="Ex: Doe"
           rules={{ required: "Last name is required." }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[styles.input, errors.lastName && styles.errorInput]}
-              placeholder="Ex: Doe"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
         />
-        {errors.lastName && <Text style={styles.errorText}>{errors.lastName.message}</Text>}
 
-        <Text style={styles.label}>Email</Text>
-        <Controller
-          control={control}
-          name="email"
-          rules={{
-            required: "Email is required.",
-            pattern: {
-              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-              message: "Invalid email address.",
-            },
+        <InputField control={control} name="email" label="Email" placeholder="example@email.com"
+          rules={{ 
+            required: "Email is required.", 
+            pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: "Invalid email address." } 
           }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[styles.input, errors.email && styles.errorInput]}
-              placeholder="janedoe@email.com"
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
         />
-        {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
 
-        <Text style={styles.label}>Password</Text>
-        <Controller
-          control={control}
-          name="password"
-          rules={{
+        <InputField control={control} name="password" label="Password" placeholder="Minimum 6 characters" secureTextEntry
+          rules={{ 
             required: "Password is required.",
-            minLength: { value: 6, message: "Minimum 6 characters required." },
+            minLength: { value: 6, message: "Minimum 6 characters required." } 
           }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[styles.input, errors.password && styles.errorInput]}
-              placeholder="Minimum 6 characters"
-              secureTextEntry
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
         />
-        {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
 
-        <Text style={styles.label}>Confirm Password</Text>
-        <Controller
-          control={control}
-          name="confirmPassword"
+        <InputField control={control} name="confirmPassword" label="Confirm Password" placeholder="Re-enter password" secureTextEntry
           rules={{
             required: "Please confirm your password.",
-            validate: (value) =>
+            validate: (value: string) =>
               value === watch("password") || "Passwords do not match.",
           }}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <TextInput
-              style={[styles.input, errors.confirmPassword && styles.errorInput]}
-              placeholder="Re-enter password"
-              secureTextEntry
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-            />
-          )}
         />
-        {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword.message}</Text>}
       </View>
 
       <View style={styles.buttonContainer}>
@@ -212,6 +143,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
     borderWidth: 1,
+    width: "100%",
+    height: 40,
   },
   buttonContainer: {
     width: "60%",
@@ -220,7 +153,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   button: {
-    backgroundColor: "#0021A5",
+    backgroundColor: "#33418b",
     alignItems: "center",
     width: "100%",
     padding: 15,
@@ -229,7 +162,7 @@ const styles = StyleSheet.create({
   buttonOutline: {
     backgroundColor: "#fff",
     marginTop: 5,
-    borderColor: '#0021A5',
+    borderColor: '#33418b',
     borderWidth: 2,
   },
   buttonText: {
