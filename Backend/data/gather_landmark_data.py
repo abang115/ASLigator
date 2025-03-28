@@ -4,58 +4,7 @@ import time
 import numpy as np
 import mediapipe as mp
 
-# Process image depending on model
-def mp_detect(image, model):
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Covert BGR to RGB
-    image.flags.writeable = False
-    results = model.process(image)                  # Make prediction based on mp.solutions model
-    image.flags.writeable = True
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)  # Convert RGB back to BGR
-    return image, results
-
-def draw_landmarks(image, results):
-    # Draw left hand connections
-    mp_drawings.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
-                               mp_drawings.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2),
-                               mp_drawings.DrawingSpec(color=(0,255,0), thickness=2, circle_radius=1))
-    # Draw right hand connections
-    mp_drawings.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
-                               mp_drawings.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2),
-                               mp_drawings.DrawingSpec(color=(0,255,0), thickness=2, circle_radius=1))
-    # Draw face connections
-    mp_drawings.draw_landmarks(image, results.face_landmarks, mp_holistic.FACEMESH_TESSELATION,
-                               mp_drawings.DrawingSpec(color=(255,0,255), thickness=1, circle_radius=1),
-                               mp_drawings.DrawingSpec(color=(0,255,0), thickness=1, circle_radius=1))
-    # Draw pose connections
-    mp_drawings.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS,
-                               mp_drawings.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2),
-                               mp_drawings.DrawingSpec(color=(0,255,0), thickness=2, circle_radius=1))
-
-
-def extract_landmarks(results):
-    left_lm, right_lm, face_lm, pose_lm = [],[],[],[]
-    # Grab coords for each left hand landmark
-    if results.left_hand_landmarks:
-        left_lm = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten()
-    else:
-        left_lm = np.zeros(21*3)
-    # Right hand landmark
-    if results.right_hand_landmarks:
-        right_lm = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten()
-    else:
-        right_lm = np.zeros(21*3)
-    # Face landmark
-    if results.face_landmarks:
-        face_lm = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten()
-    else:
-        face_lm = np.zeros(478*3)
-    # Pose Landmark
-    if results.pose_landmarks:
-        pose_lm = np.array([[res.x, res.y, res.z] for res in results.pose_landmarks.landmark]).flatten()
-    else:
-        pose_lm = np.zeros(33*3)
-    return np.concatenate([left_lm, right_lm, face_lm, pose_lm])
-
+from helper import mp_detect, draw_landmarks, extract_landmarks
 
 # Intialize mediapipe tools
 mp_holistic = mp.solutions.holistic
@@ -94,7 +43,7 @@ for sign in signs:
             break
     
         image, result = mp_detect(frame, holistic)
-        draw_landmarks(image, result)
+        draw_landmarks(image, result, mp_holistic, mp_drawings)
         i_height, i_width, _ = image.shape
         text_pos = (int(i_width * .025), int(i_height / 2))
         cv2.putText(image, f'Press r to begin capture for sign {sign[0]}',
@@ -119,7 +68,7 @@ for sign in signs:
                 break
         
             image, result = mp_detect(frame, holistic)
-            draw_landmarks(image, result)
+            draw_landmarks(image, result, mp_holistic, mp_drawings)
 
             cv2.putText(image, f'Collecting data for {sign[0]}', (15, 12), 
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)

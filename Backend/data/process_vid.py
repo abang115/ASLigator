@@ -5,44 +5,7 @@ import json
 import mediapipe as mp 
 import numpy as np
 
-# Process image depending on model
-def mp_detect(image, model):
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Covert BGR to RGB
-    image.flags.writeable = False
-    results = model.process(image)                  # Make prediction based on mp.solutions model
-    image.flags.writeable = True
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)  # Convert RGB back to BGR
-    return image, results
-
-def draw_landmarks(image, results):
-    # Draw left hand connections
-    mp_drawings.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
-                               mp_drawings.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2),
-                               mp_drawings.DrawingSpec(color=(0,255,0), thickness=2, circle_radius=1))
-    # Draw right hand connections
-    mp_drawings.draw_landmarks(image, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
-                               mp_drawings.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2),
-                               mp_drawings.DrawingSpec(color=(0,255,0), thickness=2, circle_radius=1))
-    # Draw face connections
-    mp_drawings.draw_landmarks(image, results.face_landmarks, mp_holistic.FACEMESH_TESSELATION,
-                               mp_drawings.DrawingSpec(color=(255,0,255), thickness=1, circle_radius=1),
-                               mp_drawings.DrawingSpec(color=(0,255,0), thickness=1, circle_radius=1))
-    # Draw pose connections
-    mp_drawings.draw_landmarks(image, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS,
-                               mp_drawings.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2),
-                               mp_drawings.DrawingSpec(color=(0,255,0), thickness=2, circle_radius=1))
-
-def extract_landmarks(results):
-    left_lm, right_lm, face_lm, pose_lm = [],[],[],[]
-    # Grab coords for each left hand landmark
-    left_lm = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]).flatten() if results.left_hand_landmarks else np.zeros(21*3)
-    # Right hand landmark
-    right_lm = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]).flatten() if results.right_hand_landmarks else np.zeros(21*3)
-    # Face landmark
-    face_lm = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten() if results.face_landmarks else np.zeros(468*3)
-    # Pose Landmark
-    pose_lm = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
-    return np.concatenate([face_lm, pose_lm, right_lm, left_lm])
+from helper import mp_detect, draw_landmarks, extract_landmarks
 
 def create_output_folder(output_folder, input_folder):
     # loops through the video data and makes directory
@@ -116,7 +79,7 @@ def gather_vid_lm(vid_dir, JSON_folder, npy_folder, model):
                     break
             
                 image, result = mp_detect(frame, model)
-                draw_landmarks(image, result)
+                draw_landmarks(image, result, mp_holistic, mp_drawings)
                 
                 # Append the landmarks in frame to the array
                 frame_landmarks.append(extract_landmarks(result))
