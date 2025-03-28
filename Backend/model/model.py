@@ -101,7 +101,7 @@ keypoints_normalized = data_scaled.reshape(num_samples, timesteps, features)
 # Inputs for training 
 X = keypoints_normalized
 y = to_categorical(target).astype(int)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, stratify=y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, random_state=42)
 
 # Fit based on training dataset
 model = create_simple_model()
