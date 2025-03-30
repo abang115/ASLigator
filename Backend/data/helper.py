@@ -4,10 +4,8 @@ import numpy as np
 
 # Process image depending on model
 def mp_detect(image: np.ndarray, model: mp.solutions.holistic.Holistic):
-
     if not isinstance(image, np.ndarray):
-        raise ValueError("Expected 'image' to be a NumPy array, but got {}".format(type(image)))
-
+        raise TypeError("Expected 'image' to be a NumPy array, but got {}".format(type(image)))
     if not hasattr(model, 'process'):
         raise ValueError("Expected 'model' to have a 'process' method, but got {}".format(type(model)))
 
@@ -18,12 +16,15 @@ def mp_detect(image: np.ndarray, model: mp.solutions.holistic.Holistic):
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)  # Convert RGB back to BGR
     return image, results
 
-def draw_landmarks(image, results, mp_holistic, mp_drawings):
+def draw_landmarks(image: np.ndarray, results: any, mp_holistic: mp.solutions.holistic.Holistic, mp_drawings:  mp.solutions.drawing_utils):
     if not isinstance(image, np.ndarray):
-        raise ValueError("Expected 'image' to be a NumPy array, but got {}".format(type(image)))
-
+        raise TypeError("Expected 'image' to be a NumPy array, but got {}".format(type(image)))
     if not hasattr(results, 'pose_landmarks'):
         raise ValueError("Invalid 'results' object. Expected MediaPipe detection results.")
+    if not hasattr(mp_holistic, 'HAND_CONNECTIONS'):
+        raise ValueError("Invalid 'mp_holistic' object. Expected MediaPipe Holistic Model.")
+    if not hasattr(mp_drawings, 'draw_landmarks'):
+        raise ValueError("Invalid 'mp_drawings' object. Expected MediaPipe drawing utils.")
 
     # Draw left hand connections
     mp_drawings.draw_landmarks(image, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS,
@@ -42,7 +43,7 @@ def draw_landmarks(image, results, mp_holistic, mp_drawings):
                                mp_drawings.DrawingSpec(color=(0,0,255), thickness=2, circle_radius=2),
                                mp_drawings.DrawingSpec(color=(0,255,0), thickness=2, circle_radius=1))
 
-def extract_landmarks(results):
+def extract_landmarks(results: any):
     if not hasattr(results, 'pose_landmarks'):
         raise ValueError("Invalid 'results' object. Expected MediaPipe detection results.")
 
@@ -55,4 +56,4 @@ def extract_landmarks(results):
     face_lm = np.array([[res.x, res.y, res.z] for res in results.face_landmarks.landmark]).flatten() if results.face_landmarks else np.zeros(468*3)
     # Pose Landmark
     pose_lm = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33*4)
-    return np.concatenate([face_lm, pose_lm, right_lm, left_lm])
+    return np.concatenate([pose_lm, face_lm, right_lm, left_lm])
