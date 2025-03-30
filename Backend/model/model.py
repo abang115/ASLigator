@@ -124,4 +124,5 @@ joblib.dump(scaler, 'scaler.save')
 # Save model to keras file
 print('Saving model to .keras file')
 model.save('lstm_model.keras')
+model.save_weights('lstm_model.weights.h5')
 del model

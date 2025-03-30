@@ -10,6 +10,9 @@ from keras.api.models import load_model
 model_path = os.path.join(os.getcwd(), '..', 'model', 'lstm_model.keras')
 model = load_model(model_path)
 
+model_weight = os.path.join(os.getcwd(), '..', 'model', 'lstm_model.weights.h5')
+model.load_weights(model_weight)
+
 # Load Scaling data
 scaler_path = os.path.join(os.getcwd(), '..', 'model', 'scaler.save')
 scaler = joblib.load(scaler_path)
