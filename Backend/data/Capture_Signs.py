@@ -1,5 +1,6 @@
 import cv2
 import os
+import json
 import numpy as np
 import mediapipe as mp
 from helper import mp_detect, draw_landmarks, extract_landmarks
@@ -10,6 +11,9 @@ def create_output_folder(OUTPUT_NPY_FOLDER, signs):
 
 def create_JSON_output(OUTPUT_JSON_FOLDER, OUTPUT_NPY_FOLDER):
     os.makedirs(OUTPUT_JSON_FOLDER, exist_ok=True)
+    mapping_file = 'mapping.json'
+    target_file = 'target.json'
+
     target = []
     mapping = {}
     count = 0
@@ -18,7 +22,23 @@ def create_JSON_output(OUTPUT_JSON_FOLDER, OUTPUT_NPY_FOLDER):
         mapping[sign] = count
         count += 1
         # TODO match output of this file to process_vid
-        # for video in sign_path:
+        num_vids = len(os.listdir(sign_path))
+        target.extend([mapping[sign]] * num_vids)
+    
+    # Try exporting mapping to json
+    try:
+        with open(os.path.join(OUTPUT_JSON_FOLDER, mapping_file), 'w') as f:
+            json.dump(mapping, f, indent=4)
+            f.close()
+    except Exception as e:
+        print('Error exporting:', e)
+    # Try exporting target to json
+    try:
+        with open(os.path.join(OUTPUT_JSON_FOLDER, target_file), 'w') as f:
+            json.dump(target, f, indent=4)
+            f.close()
+    except Exception as e:
+        print('Error exporting:', e)
             
             
 
@@ -89,7 +109,7 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         
         # Capture sign data
         for video in range(num_videos):
-            output_path = os.path.join(OUTPUT_FOLDER, str(sign), f'{sign}_{video}')
+            output_path = os.path.join(OUTPUT_NPY_FOLDER, str(sign), f'{sign}_{video}')
             video_landmarks = []
             
             # Capturing data
@@ -132,6 +152,8 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         # Check exit flag if actiavted during capture
         if exit_flag:
             break
+
+create_JSON_output(OUTPUT_JSON_FOLDER, OUTPUT_NPY_FOLDER)
 
 webcam.release()
 cv2.destroyAllWindows()
