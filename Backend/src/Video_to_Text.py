@@ -9,14 +9,14 @@ from keras.api.models import load_model
 
 def load_trained_model():
     # Load pre-trained model
-    model_path = os.path.join(os.getcwd(), '..', 'model', 'lstm_model.keras')
+    model_path = os.path.join(os.getcwd(), '..', 'model', 'model.keras')
     model = load_model(model_path)
 
-    model_weight = os.path.join(os.getcwd(), '..', 'model', 'lstm_model.weights.h5')
+    model_weight = os.path.join(os.getcwd(), '..', 'model', 'model.weights.h5')
     model.load_weights(model_weight)
 
     # Load action label mapping
-    with open(os.path.join(os.getcwd(), '..', 'data', 'Preprocessed_JSON_test_dataset', 'sign_mapping.json')) as f:
+    with open(os.path.join(os.getcwd(), '..', 'data', 'Processed_test_dataset', 'sign_mapping.json')) as f:
         sign_mapping = json.load(f)
     actions = list(sign_mapping)
 
@@ -70,7 +70,7 @@ colors = [
 ]
 
 # Path to video from front end
-FRONTEND_VIDEO = os.path.join(os.getcwd(), 'test.mp4')
+FRONTEND_VIDEO = os.path.join(os.getcwd(), 'Test.mp4')
 
 # Mediapipe holistic setup
 mp_holistic = mp.solutions.holistic
