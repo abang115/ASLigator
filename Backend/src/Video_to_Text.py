@@ -108,13 +108,14 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         # Process frame
         image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = holistic.process(image_rgb)
-        draw_landmarks(frame, results)
+        draw_landmarks(frame, results, mp_drawings)
 
         # Extract keypoints
         keypoints = extract_landmarks(results)
         sequence.append(keypoints)
         sequence = sequence[-30:]
         
+        text = "Awaiting Gesture..."
         # Prediction logic
         if len(sequence) == 30:
             res = model.predict(np.expand_dims(sequence, axis=0))[0]
@@ -133,18 +134,12 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
 
             frame = prob_viz(res, actions, frame, colors)
 
-        # Display with bottom bar
-        frame_height, frame_width, _ = frame.shape
-        display_frame = np.zeros((frame_height + BAR_HEIGHT, frame_width, 3), dtype=np.uint8)
-        display_frame[0:frame_height] = frame
-
-        # Text output
-        cv2.putText(display_frame, text, (10, frame_height + 35), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 2)
-        cv2.rectangle(display_frame, (0, 0), (640, 40), (245, 117, 16), -1)
-        cv2.putText(display_frame, ' '.join(sentence), (3, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        cv2.rectangle(frame, (0,0), (width, 40), (245, 117, 16), -1)
+        cv2.putText(frame, ' '.join(sentence), (3,30), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
         # Show window
-        cv2.imshow('Hand Tracking', display_frame)
+        cv2.imshow('Hand Tracking', frame)
 
         # Exit conditions
         if cv2.waitKey(1) == ord('q'):
