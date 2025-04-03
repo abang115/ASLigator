@@ -6,8 +6,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from keras.src.utils import to_categorical
 from keras.src.models import Sequential
-from keras.src.layers import LSTM, Dense, Dropout, BatchNormalization, Bidirectional, Conv1D, MaxPooling1D, Flatten, Input
-from keras.src.callbacks import TensorBoard
+from keras.src.layers import LSTM, Dense, Dropout, BatchNormalization, Conv1D, MaxPooling1D, Input
+from keras.src.callbacks import TensorBoard, ReduceLROnPlateau, EarlyStopping
 
 # Read captured data
 def read_data(data_path):
@@ -26,14 +26,35 @@ def read_data(data_path):
     
     # Open npy file and read data
     dataset = np.load(os.path.join(data_path, file_names[1]))
+
     with open(os.path.join(data_path, file_names[2]), 'r') as f:
         target = json.load(f)
         f.close()
     
     return sign_mapping, dataset, target
 
-# Create a basic LSTM Model To demo
-def create_simple_model(): # Create model
+# Create a simple LSTM model to demo
+def create_simple_model():
+    model = Sequential([
+        Input(shape=(30,1662)),
+
+        # Hidden layers to capture sequential movements
+        LSTM(64, activation='relu', return_sequences=True),
+        Dropout(0.2),
+        LSTM(128, activation='relu', return_sequences=True),
+        Dropout(0.2),
+        LSTM(64, activation='relu', return_sequences=False),
+        
+        # Decision layer
+        Dense(64, activation='relu'),
+        Dense(32, activation='relu'),
+        # Output layer
+        Dense(actions.shape[0], activation='softmax')
+    ])
+    return model
+
+# Create a complex LSTM Model
+def create_complex_model(): # Create model
     model = Sequential([
         # Input Layer
         Input(shape=(30,1662)),
@@ -41,23 +62,25 @@ def create_simple_model(): # Create model
         
         # Captures short-term temporal features
         # First Hidden Layer
-        Conv1D(filters=512, kernel_size=3, activation='relu', padding='same'),
+        Conv1D(filters=128, kernel_size=3, activation='relu', padding='same'),
         MaxPooling1D(pool_size=2, strides=2, padding='same'),
         BatchNormalization(),
         
         # Second Hidden Layer 
-        Conv1D(filters=256, kernel_size=3, activation='relu', padding='same'),
+        Conv1D(filters=64, kernel_size=3, activation='relu', padding='same'),
         MaxPooling1D(pool_size=2, strides=2, padding='same'),
         BatchNormalization(),
 
         # Captures longer sequential features
         # Third Layer
-        LSTM(512, return_sequences=True, dropout=0.1, recurrent_dropout=0.1),
-        LSTM(256, return_sequences=False, dropout=0.1, recurrent_dropout=0.1),
+        LSTM(256, return_sequences=True, activation='relu', dropout=0.1, recurrent_dropout=0.1),
+        LSTM(128, return_sequences=False, activation='relu', dropout=0.1, recurrent_dropout=0.1),
         
-        Dense(128, activation='relu'),
-        Dropout(0.5),
-        
+        # Decision layer
+        Dense(64, activation='relu'),    
+        Dropout(0.3),
+        Dense(32, activation='relu'), 
+
         # Output Layer
         Dense(len(actions), activation='softmax'),
     ])
@@ -66,11 +89,29 @@ def create_simple_model(): # Create model
 # Fit model based on the the inputted model
 def fit_model(model, X_train, y_train, epochs): 
     log_dir = os.path.join('Logs')
+    # Create callbacks
     tb_callback = TensorBoard(log_dir=log_dir)
+
+    # Define EarlyStopping
+    early_stopping = EarlyStopping(
+        monitor='loss',
+        patience=5,
+        restore_best_weights=True
+    )
+
+    # Define ReduceLROnPlateau
+    reduce_lr = ReduceLROnPlateau(
+        monitor='loss',   
+        factor=0.5,           
+        patience=3,           
+        min_lr=1e-6,          
+        verbose=1             
+)
+
     model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
-    
+
     # Fit model with data
-    result = model.fit(X_train, y_train, epochs=epochs, callbacks=[tb_callback])
+    result = model.fit(X_train, y_train, epochs=epochs, callbacks=[tb_callback, early_stopping, reduce_lr])
     return result   
 
 def compare_results(actions, res, y_test):
@@ -79,50 +120,41 @@ def compare_results(actions, res, y_test):
         expected = actions[np.argmax(y_test[i])][0]
         print(f'Pred: {predicted} -> Exp: {expected}')
     
-PREPROCESSED_DATA_PATH = os.path.join(os.getcwd(), '..', 'preprocess', 'Preprocessed_ASL_ALPHA_DATASET')
+if __name__ == '__main__':
+    PREPROCESSED_DATA_PATH = os.path.join(os.getcwd(), '..', 'preprocess', 'Preprocessed_ASL_ALPHA_DATASET')
 
-# Read preprocessed data
-sign_mapping, dataset, target = read_data(PREPROCESSED_DATA_PATH)
+    # Read preprocessed data
+    sign_mapping, dataset, target = read_data(PREPROCESSED_DATA_PATH)
 
-# Cast map to list then to npy array
-actions = np.array(list(sign_mapping.items())) # Output is in the format of ['sign', 'index']
+    # Cast map to list then to npy array
+    actions = np.array(list(sign_mapping.items())) # Output is in the format of ['sign', 'index']
 
-# Extract shape data
-num_samples, timesteps, features = np.array(dataset).shape
-data_reshaped = np.array(dataset).reshape(-1, features)
+    X = dataset
+    y = to_categorical(target).astype(int)
 
-# Normalize/Scale data using StandardScaler
-scaler = StandardScaler()
-data_scaled = scaler.fit_transform(data_reshaped)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, random_state=42)
 
-# Scaled data
-keypoints_normalized = data_scaled.reshape(num_samples, timesteps, features)
+    # Fit based on training dataset
+    model = create_simple_model() # Change this function to use a more complex model
+    fit_model(model, X_train, y_train, 200)
 
-# Inputs for training 
-X = keypoints_normalized
-y = to_categorical(target).astype(int)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, random_state=42)
+    # Predict test
+    res = model.predict(X_test)
 
-# Fit based on training dataset
-model = create_simple_model()
-fit_model(model, X_train, y_train, 20)
+    # Print predicted and expected
+    compare_results(actions, res, y_test)
 
-# Predict test
-res = model.predict(X_test)
+    # Output Accuracy
+    test_loss, test_acc = model.evaluate(X_test, y_test)
+    print(f"test acc: {test_acc*100:.4f}%")
 
-# Print predicted and expected
-compare_results(actions, res, y_test)
+    # # Save scaler data for detection
+    # print('Saving scaling data to .save file')
+    # joblib.dump(scaler, 'scaler.save')
 
-# Output Accuracy
-test_loss, test_acc = model.evaluate(X_test, y_test)
-print(f"test acc: {test_acc*100:.4f}%")
-
-# Save scaler data for detection
-print('Saving scaling data to .save file')
-joblib.dump(scaler, 'scaler.save')
-
-# Save model to keras file
-print('Saving model to .keras file')
-model.save('lstm_model.keras')
-model.save_weights('lstm_model.weights.h5')
-del model
+    # Save model to keras file
+    print('Saving model to .keras file')
+    model.save('simple_model.keras')
+    print('Saving model weigths to .weights.h5')
+    model.save_weights('simple_model.weights.h5')
+    del model
