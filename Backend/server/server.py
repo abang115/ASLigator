@@ -1,6 +1,12 @@
-from flask import Flask, request, render_template, send_from_directory
+from flask import Flask, request, send_from_directory, jsonify
 from flask_cors import CORS
 import os
+import sys
+
+root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(root_path)
+
+from src.Video_to_Text import video_to_text
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*", "send_wildcard": "False"}})
@@ -8,12 +14,6 @@ UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-#temporary html page to view video
-@app.route('/')
-def index():
-    videos = os.listdir(UPLOAD_FOLDER)
-    return render_template('video_player.html', videos=videos)
 
 @app.route('/upload', methods=['POST'])
 def upload_video():
@@ -26,8 +26,8 @@ def upload_video():
 
     video_path = os.path.join(app.config['UPLOAD_FOLDER'], video.filename)
     video.save(video_path)
-
-    return {"message": "Video uploaded successfully", "video_path": video.filename}
+    results = video_to_text(video_path)
+    return jsonify({"message": "Video uploaded successfully", 'result': results})
 
 @app.route('/videos/<filename>')
 def serve_video(filename):

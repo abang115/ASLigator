@@ -1,34 +1,44 @@
 import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { useForm} from "react-hook-form";
-import auth from "@react-native-firebase/auth"
+import { getAuth, signInWithEmailAndPassword } from "@react-native-firebase/auth"
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';
-import InputField from '../components/InputField';
+import InputField from '../components/InputField'; // Custom InputField component
 
+// FormData for form validation
 interface FormData {
   email: string;
   password: string;
 }
  
+// Login Screen function
 export default function LoginScreen() {
   const router = useRouter()
-  const { control, handleSubmit } = useForm<FormData>({
-      defaultValues: {
-        email: "",
-        password: "",
-      }
-    })
+  const auth = getAuth()
 
+  // Handles form submission with email and password
+  const { control, handleSubmit } = useForm<FormData>({
+    defaultValues: {
+      email: "",
+      password: "",
+    }
+  })
+
+  // Login function
   const login = async (data: FormData) => {
+    // Check if valid email and password
     if (data.email && data.password) {
       try {
-        const response = await auth().signInWithEmailAndPassword(
+        // Call Firebase auth to sign in using email and password
+        const response = await signInWithEmailAndPassword(
+          auth,
           data.email,
           data.password
         );
+        // Navigate to home screen on success
         if (response.user) {
-          router.push("/HomeScreen")
+          router.navigate("/HomeScreen")
         }
       } catch (e: any) {
         alert("Incorrect email or password. Please try again!")
@@ -38,18 +48,33 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior='padding'>
+
+      {/* Back Button */}
       <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={30} color="#33418b" />
       </TouchableOpacity>
 
-      <Text style={styles.headerText}>Login</Text>
+      {/* Screen Header */}
+      <Text style={styles.headerText} testID='header'>Login</Text>
+
+      {/* Navigate to Register Screen */}
+      <View style={styles.signupContainer}>
+        <Text style={styles.signupText}>Don't have an account? </Text>
+        <TouchableOpacity onPress={() => router.navigate("/RegisterScreen")}>
+            <Text style={styles.linkText}>Register!</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Input Form */}
       <View style={styles.inputContainer}>
+        {/* InputField with regex email validation */}
         <InputField control={control} name="email" label="Email" placeholder="example@email.com"
           rules={{ 
             required: "Email is required.", 
             pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: "Invalid email address." } 
           }}
         />
+        {/* InputField with minimum length of 6 to meet Firebase password requirement */}
         <InputField control={control} name="password" label="Password" placeholder="Minimum 6 characters" secureTextEntry
           rules={{ 
             required: "Password is required.",
@@ -58,6 +83,7 @@ export default function LoginScreen() {
         />
       </View>
 
+      {/* Login Button */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           onPress={ handleSubmit(login) }
@@ -67,16 +93,18 @@ export default function LoginScreen() {
          </TouchableOpacity>
       </View>
 
-      <View style={styles.signupContainer}>
-        <Text style={styles.signupText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={() => router.push("/RegisterScreen")}>
-            <Text style={styles.signupLink}>Register!</Text>
+      {/* Navigate to Forgot Password Screen */}
+      <View style={styles.forgotContainer}>
+        <TouchableOpacity onPress={() => router.navigate("/ForgotScreen")}>
+            <Text style={styles.linkText}>Forgot Password?</Text>
         </TouchableOpacity>
       </View>
+  
     </KeyboardAvoidingView>
   )
 }
 
+//Create stylesheet for the screen
 const styles = StyleSheet.create({
   label: {
     fontSize: 16,
@@ -125,7 +153,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30, 
   },
   backButton: {
     position: "absolute",
@@ -135,6 +162,12 @@ const styles = StyleSheet.create({
   },
   signupContainer: {
     flexDirection: "row",
+    marginTop: 10,
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  forgotContainer: {
+    flexDirection: "row",
     marginTop: 20,
     alignItems: "center",
   },
@@ -142,9 +175,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "gray",
   },
-  signupLink: {
+  linkText: {
     fontSize: 14,
     color: "#33418b",
     fontWeight: "bold",
+    textDecorationLine: 'underline',
   },
 })

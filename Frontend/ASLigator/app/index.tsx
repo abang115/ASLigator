@@ -2,25 +2,30 @@ import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from '
 import React from 'react'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';
- 
-export default function index() {
+
+// Landing Screen function
+export default function Index() {
   const router = useRouter()
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior='padding'>
+
+      {/* App Icon */}
       <Ionicons name="hand-right-outline" size={100} color="#33418b"/>
       <Text style={styles.headerText}>ASLigator</Text>
 
+      {/* App Description */}
       <Text style={styles.infoText}>
         ASLigator will enable any user to point their camera at ASL gestures, 
         translating them into understandable text instantly
       </Text>
       
+      {/* Navigation Buttons */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={() => router.push("/LoginScreen")} style={styles.button}>
+        <TouchableOpacity onPress={() => router.navigate("/LoginScreen")} style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("/RegisterScreen")} style={[styles.button, styles.buttonOutline]}>
+        <TouchableOpacity onPress={() => router.navigate("/RegisterScreen")} style={[styles.button, styles.buttonOutline]}>
           <Text style={styles.buttonOutlineText}>Create Account</Text>
         </TouchableOpacity>
       </View>
@@ -28,6 +33,7 @@ export default function index() {
   )
 }
 
+// Create stylesheet for the screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,

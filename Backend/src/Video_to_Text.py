@@ -34,7 +34,7 @@ def prob_viz(res, actions, input_frame, colors):
         cv2.putText(output_frame, actions[num], (0, 85 + num * 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
     return output_frame
 
-def video_to_text():
+def video_to_text(video):
     # Visualization colors
     colors = [
         (245, 117, 16), (117, 245, 16), (16, 117, 245),
@@ -43,7 +43,7 @@ def video_to_text():
     ]
 
     # Path to video from front end
-    FRONTEND_VIDEO = os.path.join(os.getcwd(), 'test.mp4')
+    FRONTEND_VIDEO = video
     print(os.getcwd())
     # Mediapipe holistic setup
     mp_holistic = mp.solutions.holistic
