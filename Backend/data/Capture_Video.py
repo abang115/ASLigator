@@ -71,7 +71,7 @@ def gather_vid_lm(vid_dir, JSON_folder, npy_folder, model):
             
             frame_landmarks = []
             
-            while num_frames != 40:
+            while num_frames != 30:
                 # Skip if file cannot be read
                 ret, frame = cam.read()
                 if not ret:
@@ -94,8 +94,8 @@ def gather_vid_lm(vid_dir, JSON_folder, npy_folder, model):
             
             # Check shape of output, if it's not expected throw it out
             try:
-                if np.array(frame_landmarks).shape != (40, 1662):
-                    print('Error: Shape not (40, 1662)')
+                if np.array(frame_landmarks).shape != (30, 1662):
+                    print('Error: Shape not (30, 1662)')
                     continue
             except Exception as e:
                 print(f'Error: {video} due to {e}')
@@ -137,8 +137,8 @@ if __name__ == '__main__':
     mp_drawings = mp.solutions.drawing_utils
 
     holistic = mp_holistic.Holistic(
-        min_detection_confidence=0.75, 
-        min_tracking_confidence=0.6
+        min_detection_confidence=0.5, 
+        min_tracking_confidence=0.5
     )
     
     # Path to training videos
