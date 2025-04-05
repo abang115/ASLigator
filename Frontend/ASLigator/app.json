@@ -8,10 +8,6 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "ios": {
-      "googleServicesFile": "./GoogleService-Info.plist",
-      "supportsTablet": true
-    },
     "android": {
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
