@@ -80,11 +80,6 @@ def download_and_trim_videos(json_file_path, output_folder, start_index=0, end_i
                     # print(f"Skipping {file_name}.")
                     continue
                 
-                # Make dir for folder/class
-                class_dir = os.path.join(output_folder, clean_text)
-                os.makedirs(class_dir, exist_ok=True)
-                
-                print(f'downloading to: {class_dir}')
                 stream.download(output_path=output_folder, filename=vid_text + '_full.mp4')     
             except Exception as e:
                 print(f"Error downloading {clean_text}: {e}")
@@ -102,6 +97,11 @@ def download_and_trim_videos(json_file_path, output_folder, start_index=0, end_i
             continue
         
         try:
+            # Make dir for folder/class
+            class_dir = os.path.join(output_folder, clean_text)
+            os.makedirs(class_dir, exist_ok=True)
+            print(f'downloading to: {class_dir}')
+            
             clip = VideoFileClip(full_video_path)
             trimmed_clip = clip.subclip(start_time, end_time)
             trimmed_clip.write_videofile(trimmed_video_path, codec="libx264", audio_codec="aac", verbose=False,
@@ -128,4 +128,4 @@ if __name__ == '__main__':
     # print(os.getcwd())
     json_file_path = 'MSASL_train.json'
     output_folder = 'train_video_folder_2'
-    download_and_trim_videos(json_file_path, output_folder, start_index=0, end_index=2000)
+    download_and_trim_videos(json_file_path, output_folder, start_index=2500, end_index=3000)
