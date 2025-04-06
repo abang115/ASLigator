@@ -7,18 +7,14 @@ import numpy as np
 from keras.api.models import load_model
 
 # Load pre-trained model
-model_path = os.path.join(os.getcwd(), '..', 'model', 'lstm_model.keras')
+model_path = os.path.join(os.getcwd(), '..', 'model', 'model.keras')
 model = load_model(model_path)
 
-model_weight = os.path.join(os.getcwd(), '..', 'model', 'lstm_model.weights.h5')
+model_weight = os.path.join(os.getcwd(), '..', 'model', 'model.weights.h5')
 model.load_weights(model_weight)
 
-# Load Scaling data
-scaler_path = os.path.join(os.getcwd(), '..', 'model', 'scaler.save')
-scaler = joblib.load(scaler_path)
-
 # Load action label mapping
-with open(os.path.join(os.getcwd(), '..', 'preprocess', 'Preprocessed_ASL_ALPHA_DATASET', 'sign_mapping.json')) as f:
+with open(os.path.join(os.getcwd(), '..', 'data', 'Processed_test_dataset', 'sign_mapping.json')) as f:
     sign_mapping = json.load(f)
 actions = list(sign_mapping)
 
@@ -86,8 +82,7 @@ while cap.isOpened():
     
     text = "Awaiting Gesture..."
     if len(sequence) == 30:
-        sequence_scaled = scaler.fit_transform(np.array(sequence))
-        res = model.predict(np.expand_dims(sequence_scaled, axis=0))[0]
+        res = model.predict(np.expand_dims(sequence, axis=0))[0]
         
         pred_index = np.argmax(res)
         text = actions[pred_index]
