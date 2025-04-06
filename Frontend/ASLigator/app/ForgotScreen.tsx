@@ -96,17 +96,6 @@ const styles = StyleSheet.create({
   inputContainer: {
       width: '80%',
   },
-  input: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    borderWidth: 1,
-    marginTop: 5,
-    marginBottom: 20,
-    width: '100%',
-    height: 40,
-  },
   buttonContainer: {
     width: "60%",
     justifyContent: 'center',
@@ -137,27 +126,6 @@ const styles = StyleSheet.create({
     top: 20, 
     left: 20,
     zIndex: 10,
-  },
-  signupContainer: {
-    flexDirection: "row",
-    marginTop: 10,
-    marginBottom: 20,
-    alignItems: "center",
-  },
-  forgotContainer: {
-    flexDirection: "row",
-    marginTop: 20,
-    alignItems: "center",
-  },
-  signupText: {
-    fontSize: 14,
-    color: "gray",
-  },
-  linkText: {
-    fontSize: 14,
-    color: "#33418b",
-    fontWeight: "bold",
-    textDecorationLine: 'underline',
   },
   infoText: {
     fontSize: 20,

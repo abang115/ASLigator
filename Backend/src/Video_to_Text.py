@@ -123,7 +123,3 @@ def video_to_text(video):
     webcam.release()
     cv2.destroyAllWindows()
     return sentence
-
-if __name__ == "__main__":
-    sentence = video_to_text()
-    print(sentence)
