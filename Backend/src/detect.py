@@ -28,7 +28,7 @@ colors = [
 # Mediapipe holistic setup
 mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
-holistic = mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=0.6)
+holistic = mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
 # Helper: Draw probability bars
 def prob_viz(res, actions, input_frame, colors):
@@ -55,7 +55,7 @@ def extract_landmarks(results):
     face = flatten_landmarks(results.face_landmarks) if results.face_landmarks else np.zeros(468 * 3)
     pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33 * 4)
     
-    return np.concatenate([face, pose, right, left])
+    return np.concatenate([pose, face, right, left])
 
 # Webcam setup
 cap = cv2.VideoCapture(0)
