@@ -1,13 +1,13 @@
 import { KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useForm } from "react-hook-form";
 import React from 'react'
-import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth"
-import db from "@react-native-firebase/database"
-import firestore from "@react-native-firebase/firestore"
+import { getAuth, createUserWithEmailAndPassword } from "@react-native-firebase/auth"
+import { getFirestore, collection, doc, setDoc, serverTimestamp } from "@react-native-firebase/firestore"
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';
-import InputField from '@/components/InputField';
+import InputField from '@/components/InputField'; // Custom InputField component
 
+// FormData for form validation
 interface FormData {
   firstName: string;
   lastName: string;
@@ -16,8 +16,13 @@ interface FormData {
   confirmPassword: string;
 }
 
+// Register Screen function
 export default function RegisterScreen() {
   const router = useRouter()
+  const auth = getAuth()
+  const firestore = getFirestore()
+
+  // Handle form submission with required values
   const { control, handleSubmit, watch } = useForm<FormData>({
     defaultValues: {
       firstName: "",
@@ -28,60 +33,73 @@ export default function RegisterScreen() {
     }
   })
 
-  const createProfile = async (response: FirebaseAuthTypes.UserCredential, data: FormData) => {
-    db().ref(`/users/${response.user.uid}`).set({ 
-      firstName: data.firstName,
-      lastName: data.lastName,
-     });
-  };
-
+  // Register user function
   const register = async (data: FormData) => {
-      if (data.email && data.password) {
-        try {
-          const response = await auth().createUserWithEmailAndPassword(
-            data.email,
-            data.password
-          );
-          if (response.user) {
-            await createProfile(response, data)
-            await firestore().collection("users").doc(response.user.uid).set({
-              firstName: data.firstName,
-              lastName: data.lastName,
-              email: data.email,
-              profilePicture: "",
-              createdAt: firestore.FieldValue.serverTimestamp(),
-            });
-            router.push("/HomeScreen")
-          }
-        } catch (e: any) {
-          if(e.code === "auth/email-already-in-use") {
-            alert("That email is already in use.")
-          }
-          else {
-            alert("There was an error creating your account.")
-          }
+    // Check if valid email and password
+    if (data.email && data.password) {
+      try {
+        // Call Firebase auth to create user with email and password
+        const response = await createUserWithEmailAndPassword(
+          auth,
+          data.email,
+          data.password
+        );
+        // On success, store user data in firestore
+        if (response.user) {
+          await setDoc(doc(collection(firestore, "users"), response.user.uid), {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            profilePicture: "",
+            createdAt: serverTimestamp(),
+          });
+          // Navigate to Home Screen
+          router.navigate("/HomeScreen")
+        }
+      } catch (e: any) {
+        // Check error codes and display appropriate error
+        if(e.code === "auth/email-already-in-use") {
+          alert("That email is already in use.")
+        }
+        else {
+          alert("There was an error creating your account.")
         }
       }
+    }
   };
 
   return (
-    <KeyboardAvoidingView
-        style={styles.container}
-        behavior='padding'
-    >
+    <KeyboardAvoidingView style={styles.container} behavior='padding'>
+
+      {/* Back Button */}
       <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
         <Ionicons name="arrow-back" size={30} color="#33418b" />
       </TouchableOpacity>
+
+      {/* Screen Header */}
       <Text style={styles.headerText}>Register</Text>
+
+      {/* Navigate to Login Screen */}
+      <View style={styles.loginContainer}>
+        <Text style={styles.loginText}>Already have an account? </Text>
+        <TouchableOpacity onPress={() => router.navigate("/LoginScreen")}>
+          <Text style={styles.loginLink}>Log In!</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Input Form */}
       <View style={styles.inputContainer}>
+        {/* InputField requiring first name  */}
         <InputField control={control} name="firstName" label="First Name" placeholder="Ex: Jane"
           rules={{ required: "First name is required." }}
         />
 
+        {/* InputField requiring last name  */}
         <InputField control={control} name="lastName" label="Last Name" placeholder="Ex: Doe"
           rules={{ required: "Last name is required." }}
         />
 
+        {/* InputField with regex email validation */}
         <InputField control={control} name="email" label="Email" placeholder="example@email.com"
           rules={{ 
             required: "Email is required.", 
@@ -89,6 +107,7 @@ export default function RegisterScreen() {
           }}
         />
 
+        {/* InputField with minimum length of 6 to meet Firebase password requirement */}
         <InputField control={control} name="password" label="Password" placeholder="Minimum 6 characters" secureTextEntry
           rules={{ 
             required: "Password is required.",
@@ -96,6 +115,7 @@ export default function RegisterScreen() {
           }}
         />
 
+        {/* InputField requiring passwords to match */}
         <InputField control={control} name="confirmPassword" label="Confirm Password" placeholder="Re-enter password" secureTextEntry
           rules={{
             required: "Please confirm your password.",
@@ -105,6 +125,7 @@ export default function RegisterScreen() {
         />
       </View>
 
+      {/* Register Button */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           onPress={ handleSubmit(register) }
@@ -112,16 +133,11 @@ export default function RegisterScreen() {
         <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.loginContainer}>
-      <Text style={styles.loginText}>Already have an account? </Text>
-        <TouchableOpacity onPress={() => router.push("/LoginScreen")}>
-          <Text style={styles.loginLink}>Log In!</Text>
-        </TouchableOpacity>
-      </View>
     </KeyboardAvoidingView>
   )
 }
 
+// Create stylesheet for the screen
 const styles = StyleSheet.create({
   label: {
     fontSize: 16,
@@ -180,7 +196,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30, 
   },
   backButton: {
     position: "absolute",
@@ -190,7 +205,8 @@ const styles = StyleSheet.create({
   },
   loginContainer: {
     flexDirection: "row",
-    marginTop: 20,
+    marginTop: 10,
+    marginBottom: 20, 
     alignItems: "center",
   },
   loginText: {

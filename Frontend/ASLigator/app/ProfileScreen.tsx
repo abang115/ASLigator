@@ -3,27 +3,34 @@ import React, {useState, useEffect} from 'react'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker'
-import storage from '@react-native-firebase/storage';
-import auth from "@react-native-firebase/auth"
-import firestore from "@react-native-firebase/firestore"
- 
+import { getStorage, ref, putFile, getDownloadURL } from '@react-native-firebase/storage';
+import { getAuth, signOut } from "@react-native-firebase/auth"
+import { getFirestore, doc, getDoc, setDoc } from "@react-native-firebase/firestore"
+
 export default function ProfileScreen() {
   const router = useRouter()
+  const auth = getAuth()
+  const firestore = getFirestore()
+  const storage = getStorage()
+  
   const [image, setImage] = useState<string | null>(null);
   const [userData, setUserData] = useState<{ firstName?: string; lastName?: string; email?: string }>({});
 
   useEffect(() => {
     const loadProfilePicture = async () => {
-      const userId = auth().currentUser?.uid;
+      const userId = auth.currentUser?.uid;
       if (userId) {
-        const doc = await firestore().collection('users').doc(userId).get();
-        if (doc.exists) {
+        const userDocRef = doc(firestore, "users", userId);
+        const docSnap = await getDoc(userDocRef);
+
+        if (docSnap.exists) {
+          const data = docSnap.data();
           setUserData({
-            firstName: doc.data()?.firstName || '',
-            lastName: doc.data()?.lastName || '',
-            email: doc.data()?.email || '',
+            firstName: data?.firstName || '',
+            lastName: data?.lastName || '',
+            email: data?.email || '',
           });
-          setImage(doc.data()?.profilePicture);
+          setImage(data?.profilePicture || null);
         }
       }
     };
@@ -46,15 +53,15 @@ export default function ProfileScreen() {
   };
 
   const uploadImage = async (imageUri: string) => {
-    const userId = auth().currentUser?.uid;
+    const userId = auth.currentUser?.uid;
     if (!userId || !imageUri) return;
 
     const fileName = `profile_pictures/${userId}.jpg`;
-    const reference = storage().ref(fileName);
+    const reference = ref(storage, fileName);
 
     try {
-      await reference.putFile(imageUri);
-      const url = await reference.getDownloadURL();
+      await putFile(reference, imageUri);
+      const url = await getDownloadURL(reference);
       await saveProfilePictureUrl(url);
       Alert.alert("Upload Successful", "Your profile picture has been updated!");
     } catch (error) {
@@ -64,19 +71,17 @@ export default function ProfileScreen() {
   };
 
   const saveProfilePictureUrl = async (url: string) => {
-    const userId = auth().currentUser?.uid;
+    const userId = auth.currentUser?.uid;
     if (userId) {
-      await firestore().collection('users').doc(userId).set(
-        { profilePicture: url },
-        { merge: true }
-      );
+      const userDocRef = doc(firestore, "users", userId);
+      await setDoc(userDocRef, { profilePicture: url }, { merge: true });
     }
   };
 
-  const signOut= async () => {
+  const signOutUser = async () => {
     try {
-      await auth().signOut()
-      router.push("/")
+      await signOut(auth)
+      router.navigate("/")
     }
     catch (e) {
       alert("Error, could not sign out!")
@@ -107,7 +112,7 @@ export default function ProfileScreen() {
       <Text style={styles.profileText}>First Name: {userData.firstName}</Text>
       <Text style={styles.profileText}>Last Name: {userData.lastName}</Text>
       <Text style={styles.profileText}>Email: {userData.email}</Text>
-      <TouchableOpacity onPress={signOut} style={styles.button}>
+      <TouchableOpacity onPress={signOutUser} style={styles.button}>
         <Text style={styles.buttonText}>Sign Out</Text>
       </TouchableOpacity>
      </KeyboardAvoidingView>
