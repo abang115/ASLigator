@@ -1,16 +1,26 @@
 import { CameraView, CameraType, useCameraPermissions, useMicrophonePermissions } from 'expo-camera'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { Button, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import axios from 'axios'
 import * as Speech from 'expo-speech';
+import { getAuth} from "@react-native-firebase/auth"
+import { getFirestore, doc, getDoc } from "@react-native-firebase/firestore"
+import { useFocusEffect } from '@react-navigation/native';
 
 // Retrieve API URL from .env file
 const API_URL = process.env.EXPO_PUBLIC_API_URL
 
 export default function HomeScreen() {
   const router = useRouter();
+  const auth = getAuth();
+  const firestore = getFirestore();
+
+  // Voice settings
+  const [selectedVoice, setSelectedVoice] = useState("")
+  const [selectedSpeed, setSelectedSpeed] = useState(1);
+  const [selectedPitch, setSelectedPitch] = useState(1);
 
   // Set camera direction
   const [facing] = useState<CameraType>('back');
@@ -24,11 +34,37 @@ export default function HomeScreen() {
   const [isRecording, setIsRecording] = useState(false);
 
   // Store and set translated text
-  const [translatedText, setTranslatedText] = useState<string>('');;
+  const [translatedText, setTranslatedText] = useState("");;
+
+  // Load settings whenever screen is loaded
+  useFocusEffect(
+    useCallback(() => {
+      const loadSettings = async () => {
+        const userId = auth.currentUser?.uid;
+        if (userId) {
+          const userDocRef = doc(firestore, "users", userId);
+          const docSnap = await getDoc(userDocRef);
+        
+          if (docSnap.exists) {
+            const data = docSnap.data();
+            setSelectedVoice(data?.voiceSetting);
+            setSelectedSpeed(data?.speedSetting);
+            setSelectedPitch(data?.pitchSetting);
+          }
+        }
+      };
+    loadSettings();
+    }, [])
+  );
 
   // Speak function for text-to-speech 
   const speak = (thingToSay: string) => {
-    Speech.speak(thingToSay);
+    const options = {
+      voice: selectedVoice,
+      rate: selectedSpeed,
+      pitch: selectedPitch,
+    }
+    Speech.speak(thingToSay, options);
   };
 
   // Check current camera and microphone permissions
@@ -176,7 +212,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '90%',
     height: '70%',
-    borderRadius: 20,
+    borderRadius: 10,
     borderWidth: 2,
     overflow: 'hidden',
     marginTop: 55,
@@ -202,7 +238,7 @@ const styles = StyleSheet.create({
     width: '90%',
     height: '20%',
     borderWidth: 2,
-    borderRadius: 25,
+    borderRadius: 10,
     marginTop: 10,
     marginBottom: 10,
     borderColor: "#33418b",
