@@ -8,9 +8,10 @@ interface InputFieldProps {
   placeholder: string;
   secureTextEntry?: boolean;
   rules?: object;
+  testID?: string;
 }
 
-const InputField: React.FC<InputFieldProps> = ({ control, name, label, placeholder, secureTextEntry, rules }) => (
+const InputField: React.FC<InputFieldProps> = ({ control, name, label, placeholder, secureTextEntry, rules, testID }) => (
   <View>
     <Text style={styles.label}>{label}</Text>
     <Controller
@@ -26,6 +27,7 @@ const InputField: React.FC<InputFieldProps> = ({ control, name, label, placehold
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
+            testID={testID}
           />
           {error && <Text style={styles.errorText}>{error.message}</Text>}
         </>

@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import axios from 'axios'
 import * as Speech from 'expo-speech';
-import { getAuth} from "@react-native-firebase/auth"
+import { getAuth } from "@react-native-firebase/auth"
 import { getFirestore, doc, getDoc } from "@react-native-firebase/firestore"
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -155,32 +155,40 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.settingsButton} onPress={() => router.navigate("/SettingsScreen")}>
+
+      {/* Settings Button */}
+      <TouchableOpacity style={styles.settingsButton} onPress={() => router.navigate("/SettingsScreen")} testID='settings'>
         <Ionicons name="settings" size={30} color="white"/>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.profileButton} onPress={() => router.navigate("/ProfileScreen")}>
+      {/* Profile Button */}
+      <TouchableOpacity style={styles.profileButton} onPress={() => router.navigate("/ProfileScreen")} testID='profile'>
         <Ionicons name="person" size={30} color="white"/>
       </TouchableOpacity>
       
+      {/* Expo Camera */}
       <CameraView
         mode="video"
         ref={cameraRef} 
         style={styles.camera} 
         facing={facing}
+        testID='camera'
        >
+        {/* Recording Button */}
         <View style={styles.buttonContainer}>
           {!isRecording ? (
-            <TouchableOpacity onPress={startRecording} style={styles.button}>
+            <TouchableOpacity onPress={startRecording} style={styles.button} testID='start'>
               <Text style={styles.text}>Start Recording</Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity onPress={stopRecording} style={[styles.button]}>
+            <TouchableOpacity onPress={stopRecording} style={[styles.button]} testID='=stop'>
               <Text style={styles.text}>Stop Recording</Text>
             </TouchableOpacity>
           )}
         </View>
       </CameraView>
+
+      {/* Translated Text Box */}
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
@@ -188,8 +196,11 @@ export default function HomeScreen() {
           textAlignVertical="top"
           value={translatedText}
           editable={false}
+          testID='text'
         />
-        <TouchableOpacity style={styles.speechButton} onPress={() => speak(translatedText)}>
+
+        {/* TTS Button */}
+        <TouchableOpacity style={styles.speechButton} onPress={() => speak(translatedText)} testID='speech'>
             <Ionicons name='mic-outline' size={30} color="white"/>
         </TouchableOpacity>
       </View>

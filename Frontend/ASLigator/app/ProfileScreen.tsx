@@ -16,6 +16,7 @@ export default function ProfileScreen() {
   const [image, setImage] = useState<string | null>(null);
   const [userData, setUserData] = useState<{ firstName?: string; lastName?: string; email?: string }>({});
 
+  // Load profile picture when screen is loaded
   useEffect(() => {
     const loadProfilePicture = async () => {
       const userId = auth.currentUser?.uid;
@@ -37,6 +38,7 @@ export default function ProfileScreen() {
     loadProfilePicture();
   }, []);
   
+  // Allow user to pick their profile picture
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: 'images',
@@ -52,6 +54,7 @@ export default function ProfileScreen() {
     }
   };
 
+  // Uploads selected profile picture to firebase storage
   const uploadImage = async (imageUri: string) => {
     const userId = auth.currentUser?.uid;
     if (!userId || !imageUri) return;
@@ -70,6 +73,7 @@ export default function ProfileScreen() {
     }
   };
 
+  // Saves profile picture URL to firestore to load in when screen is loaded
   const saveProfilePictureUrl = async (url: string) => {
     const userId = auth.currentUser?.uid;
     if (userId) {
@@ -78,6 +82,7 @@ export default function ProfileScreen() {
     }
   };
 
+  // Signs out the user
   const signOutUser = async () => {
     try {
       await signOut(auth)
@@ -90,10 +95,13 @@ export default function ProfileScreen() {
   
   return (
      <KeyboardAvoidingView style={styles.container} behavior='padding'>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-           <Ionicons name="arrow-back" size={30} color="#33418b" />
-        </TouchableOpacity>
 
+      {/* Back Button */}
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={30} color="#33418b" />
+      </TouchableOpacity>
+
+      {/* Profile Picture */}
       <TouchableOpacity onPress={pickImage} style={styles.imageWrapper}>
         <View style={styles.imageContainer}>
           {image ? (
@@ -103,22 +111,27 @@ export default function ProfileScreen() {
           )}
         </View>
 
+        {/* Change Profile Picture Button */}
         <View style={styles.cameraIconContainer}>
           <Ionicons name="camera" size={22} color="white" />
         </View>
       </TouchableOpacity>
 
+      {/* User Information */}
       <Text style={styles.headerText}>Profile</Text>
       <Text style={styles.profileText}>First Name: {userData.firstName}</Text>
       <Text style={styles.profileText}>Last Name: {userData.lastName}</Text>
       <Text style={styles.profileText}>Email: {userData.email}</Text>
+
+      {/* Sign Out Button */}
       <TouchableOpacity onPress={signOutUser} style={styles.button}>
         <Text style={styles.buttonText}>Sign Out</Text>
       </TouchableOpacity>
      </KeyboardAvoidingView>
    )
  }
- 
+
+// Create stylesheet for the screen
  const styles = StyleSheet.create({
    container: {
     flex: 1,
