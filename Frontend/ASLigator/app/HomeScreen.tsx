@@ -173,6 +173,7 @@ export default function HomeScreen() {
         style={styles.camera} 
         facing={facing}
         testID='camera'
+        zoom={0}
        >
         {/* Recording Button */}
         <View style={styles.buttonContainer}>
@@ -181,7 +182,7 @@ export default function HomeScreen() {
               <Text style={styles.text}>Start Recording</Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity onPress={stopRecording} style={[styles.button]} testID='=stop'>
+            <TouchableOpacity onPress={stopRecording} style={[styles.button]} testID='stop'>
               <Text style={styles.text}>Stop Recording</Text>
             </TouchableOpacity>
           )}

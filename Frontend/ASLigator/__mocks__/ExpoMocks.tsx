@@ -3,6 +3,8 @@ import type { ViewProps } from 'react-native';
 /* Mock global alerts */
 global.alert = jest.fn();
 
+global.FormData = jest.fn();
+
 /* Mock icons */
 jest.mock("@expo/vector-icons", () => ({
     Ionicons: "",
@@ -20,10 +22,14 @@ jest.mock('expo-router', () => ({
 }));
 
 /* Mock expo camera */
+export const mockRecordAsync = jest.fn();
+export const mockStopRecording = jest.fn();
+
 interface MockCameraViewProps extends ViewProps {
   children?: React.ReactNode;
   testID?: string;
 }
+
 jest.mock('expo-camera', () => {
   const React = require('react');
   const { View } = require('react-native');
@@ -33,8 +39,8 @@ jest.mock('expo-camera', () => {
     ref: React.Ref<any>
   ) {
     React.useImperativeHandle(ref, () => ({
-      recordAsync: jest.fn().mockResolvedValue({ uri: 'test-uri' }),
-      stopRecording: jest.fn(),
+      recordAsync: mockRecordAsync,
+      stopRecording: mockStopRecording,
     }));
   
     return <View testID={testID}>{children}</View>;
@@ -60,3 +66,24 @@ jest.mock('@react-navigation/native', () => ({
 jest.mock('expo-speech', () => ({
   speak: jest.fn(),
 }));
+
+/* Mock picker */
+jest.mock('@react-native-picker/picker', () => {
+  const React = require('React')
+  const RealComponent = jest.requireActual('@react-native-picker/picker')
+
+  class Picker extends React.Component {
+    static Item = (props: { children: never }) => {
+      return React.createElement('Item', props, props.children)
+    }
+
+    render () {
+      return React.createElement('Picker', this.props, this.props.children)
+    }
+  }
+
+  Picker.propTypes = RealComponent.propTypes
+  return {
+    Picker
+  }
+});
