@@ -1,6 +1,5 @@
 import os
 import json
-import joblib
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -95,7 +94,7 @@ def fit_model(model, X_train, y_train, epochs):
     # Define EarlyStopping
     early_stopping = EarlyStopping(
         monitor='loss',
-        patience=5,
+        patience=20,
         restore_best_weights=True
     )
 
@@ -103,7 +102,7 @@ def fit_model(model, X_train, y_train, epochs):
     reduce_lr = ReduceLROnPlateau(
         monitor='loss',   
         factor=0.5,           
-        patience=3,           
+        patience=20,           
         min_lr=1e-6,          
         verbose=1             
 )
@@ -115,13 +114,13 @@ def fit_model(model, X_train, y_train, epochs):
     return result   
 
 def compare_results(actions, res, y_test):
-    for i in range(10):
+    for i in range(20):
         predicted = actions[np.argmax(res[i])][0]
         expected = actions[np.argmax(y_test[i])][0]
         print(f'Pred: {predicted} -> Exp: {expected}')
     
 if __name__ == '__main__':
-    PREPROCESSED_DATA_PATH = os.path.join(os.getcwd(), '..', 'preprocess', 'Preprocessed_ASL_ALPHA_DATASET')
+    PREPROCESSED_DATA_PATH = os.path.join(os.getcwd(), '..', 'data', 'Processed_test_dataset')
 
     # Read preprocessed data
     sign_mapping, dataset, target = read_data(PREPROCESSED_DATA_PATH)
@@ -132,10 +131,10 @@ if __name__ == '__main__':
     X = dataset
     y = to_categorical(target).astype(int)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, shuffle=True, random_state=42)
 
     # Fit based on training dataset
-    model = create_simple_model() # Change this function to use a more complex model
+    model = create_complex_model() # Change this function to use a more complex model
     fit_model(model, X_train, y_train, 200)
 
     # Predict test
@@ -148,13 +147,9 @@ if __name__ == '__main__':
     test_loss, test_acc = model.evaluate(X_test, y_test)
     print(f"test acc: {test_acc*100:.4f}%")
 
-    # # Save scaler data for detection
-    # print('Saving scaling data to .save file')
-    # joblib.dump(scaler, 'scaler.save')
-
     # Save model to keras file
     print('Saving model to .keras file')
-    model.save('simple_model.keras')
+    model.save('model.keras')
     print('Saving model weigths to .weights.h5')
-    model.save_weights('simple_model.weights.h5')
+    model.save_weights('model.weights.h5')
     del model

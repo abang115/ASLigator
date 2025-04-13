@@ -7,18 +7,14 @@ import numpy as np
 from keras.api.models import load_model
 
 # Load pre-trained model
-model_path = os.path.join(os.getcwd(), '..', 'model', 'lstm_model.keras')
+model_path = os.path.join(os.getcwd(), '..', 'model', 'model.keras')
 model = load_model(model_path)
 
-model_weight = os.path.join(os.getcwd(), '..', 'model', 'lstm_model.weights.h5')
+model_weight = os.path.join(os.getcwd(), '..', 'model', 'model.weights.h5')
 model.load_weights(model_weight)
 
-# Load Scaling data
-scaler_path = os.path.join(os.getcwd(), '..', 'model', 'scaler.save')
-scaler = joblib.load(scaler_path)
-
 # Load action label mapping
-with open(os.path.join(os.getcwd(), '..', 'preprocess', 'Preprocessed_ASL_ALPHA_DATASET', 'sign_mapping.json')) as f:
+with open(os.path.join(os.getcwd(), '..', 'data', 'Processed_test_dataset', 'sign_mapping.json')) as f:
     sign_mapping = json.load(f)
 actions = list(sign_mapping)
 
@@ -32,7 +28,7 @@ colors = [
 # Mediapipe holistic setup
 mp_holistic = mp.solutions.holistic
 mp_drawing = mp.solutions.drawing_utils
-holistic = mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=0.6)
+holistic = mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
 # Helper: Draw probability bars
 def prob_viz(res, actions, input_frame, colors):
@@ -59,7 +55,7 @@ def extract_landmarks(results):
     face = flatten_landmarks(results.face_landmarks) if results.face_landmarks else np.zeros(468 * 3)
     pose = np.array([[res.x, res.y, res.z, res.visibility] for res in results.pose_landmarks.landmark]).flatten() if results.pose_landmarks else np.zeros(33 * 4)
     
-    return np.concatenate([face, pose, right, left])
+    return np.concatenate([pose, face, right, left])
 
 # Webcam setup
 cap = cv2.VideoCapture(0)
@@ -86,8 +82,7 @@ while cap.isOpened():
     
     text = "Awaiting Gesture..."
     if len(sequence) == 30:
-        sequence_scaled = scaler.fit_transform(np.array(sequence))
-        res = model.predict(np.expand_dims(sequence_scaled, axis=0))[0]
+        res = model.predict(np.expand_dims(sequence, axis=0))[0]
         
         pred_index = np.argmax(res)
         text = actions[pred_index]

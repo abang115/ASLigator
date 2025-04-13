@@ -1,8 +1,8 @@
 {
-    "hello": 0,
-    "_": 1,
-    "iam": 2,
-    "tired": 3,
-    "hungry": 4,
-    "good": 5
+    "Good": 0,
+    "Hello": 1,
+    "Hungry": 2,
+    "I am": 3,
+    "Tired": 4,
+    "_": 5
 }
