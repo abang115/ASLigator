@@ -114,7 +114,7 @@ def fit_model(model, X_train, y_train, epochs):
     return result   
 
 def compare_results(actions, res, y_test):
-    for i in range(10):
+    for i in range(20):
         predicted = actions[np.argmax(res[i])][0]
         expected = actions[np.argmax(y_test[i])][0]
         print(f'Pred: {predicted} -> Exp: {expected}')
@@ -131,10 +131,10 @@ if __name__ == '__main__':
     X = dataset
     y = to_categorical(target).astype(int)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, shuffle=True, random_state=42)
 
     # Fit based on training dataset
-    model = create_simple_model() # Change this function to use a more complex model
+    model = create_complex_model() # Change this function to use a more complex model
     fit_model(model, X_train, y_train, 200)
 
     # Predict test
