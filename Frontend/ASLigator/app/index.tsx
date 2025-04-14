@@ -22,10 +22,10 @@ export default function Index() {
       
       {/* Navigation Buttons */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={() => router.navigate("/LoginScreen")} style={styles.button}>
+        <TouchableOpacity onPress={() => router.navigate("/LoginScreen")} style={styles.button} testID='Login'>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.navigate("/RegisterScreen")} style={[styles.button, styles.buttonOutline]}>
+        <TouchableOpacity onPress={() => router.navigate("/RegisterScreen")} style={[styles.button, styles.buttonOutline]} testID='Register'>
           <Text style={styles.buttonOutlineText}>Create Account</Text>
         </TouchableOpacity>
       </View>
