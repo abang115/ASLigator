@@ -174,6 +174,8 @@ export default function HomeScreen() {
         facing={facing}
         testID='camera'
         zoom={0}
+        videoQuality='720p'
+        ratio='16:9'
        >
         {/* Recording Button */}
         <View style={styles.buttonContainer}>
@@ -222,13 +224,13 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
-    width: '90%',
-    height: '70%',
+    width: '100%',
     borderRadius: 10,
     borderWidth: 2,
     overflow: 'hidden',
     marginTop: 55,
     borderColor: "#33418b",
+    aspectRatio: 9 / 16
   },
   buttonContainer: {
     flex: 1,
@@ -248,7 +250,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: '90%',
-    height: '20%',
+    height: '15%',
     borderWidth: 2,
     borderRadius: 10,
     marginTop: 10,
