@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import type { ViewProps } from 'react-native';
 
 /* Mock global alerts */
@@ -59,12 +60,25 @@ jest.mock('axios');
 
 /* Mock useFocusEffect function */
 jest.mock('@react-navigation/native', () => ({
-  useFocusEffect: (callback: any) => callback()
+  useFocusEffect: (callback: any) => callback(),
+  useEffect: (callback: any) => callback()
 }));
 
 /* Mock expo speech */
+export const mockSpeak = jest.fn();
+
 jest.mock('expo-speech', () => ({
-  speak: jest.fn(),
+  speak: mockSpeak,
+}));
+
+/* Mock expo image picker */
+export const mockLaunchImage = jest.fn().mockResolvedValue({
+  canceled: false,
+  assets: [{ uri: 'test.jpg'}],
+})
+
+jest.mock('expo-image-picker', () => ({
+  launchImageLibraryAsync: mockLaunchImage,
 }));
 
 /* Mock picker */

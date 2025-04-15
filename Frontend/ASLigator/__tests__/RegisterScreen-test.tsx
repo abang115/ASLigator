@@ -3,12 +3,12 @@ import { mockBack, mockNav } from '../__mocks__/ExpoMocks';
 import '../__mocks__/FirebaseMocks'
 
 import RegisterScreen from '@/app/RegisterScreen';
-import { createUserWithEmailAndPassword } from '@react-native-firebase/auth';
+import { mockCreateUser } from '../__mocks__/FirebaseMocks';
 
 describe('<RegisterScreen/>', () => {
   // Reset navigation before each test
   beforeEach(() => {
-    mockNav.mockReset();
+    jest.clearAllMocks()
   });
 
   // Test if components are rendering correctly
@@ -70,7 +70,7 @@ describe('<RegisterScreen/>', () => {
     fireEvent.press(getByTestId('registerButton'))
   
     await waitFor(() => {
-        expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
+        expect(mockCreateUser).toHaveBeenCalledWith(
           expect.anything(),
           "test@example.com",
           "password123"
