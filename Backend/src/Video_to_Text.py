@@ -5,11 +5,12 @@ import sys
 import mediapipe as mp
 import numpy as np
 from keras.api.models import load_model
+from pymediainfo import MediaInfo
 
 root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(root_path)
 
-from data.helper import draw_landmarks, extract_landmarks
+from data.helper import draw_landmarks, extract_landmarks, mp_detect
 
 def load_trained_model():
     # Load pre-trained model
@@ -34,6 +35,16 @@ def prob_viz(res, actions, input_frame, colors):
         cv2.putText(output_frame, actions[num], (0, 85 + num * 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
     return output_frame
 
+# Check for rotation
+def check_rotation(filename):
+    media_info = MediaInfo.parse(filename)
+    for track in media_info.tracks:
+        if track.track_type == "Video":
+            # Some files might have a 'rotation' attribute, aka video taken in portrait mode
+            if hasattr(track, "rotation") and int(float(track.rotation)) != 0:
+                return True
+    return False
+
 def video_to_text(video):
     # Visualization colors
     colors = [
@@ -44,7 +55,7 @@ def video_to_text(video):
 
     # Path to video from front end
     FRONTEND_VIDEO = video
-    print(os.getcwd())
+
     # Mediapipe holistic setup
     mp_holistic = mp.solutions.holistic
     mp_drawings = mp.solutions.drawing_utils
@@ -56,14 +67,19 @@ def video_to_text(video):
     # Webcam setup
     webcam = cv2.VideoCapture(FRONTEND_VIDEO)
 
-    # Constants
+    # Set resolution (width x height), Should be the resolution of the mp4 sent by mobile device
     width = 1280
     height = 720
     webcam.set(cv2.CAP_PROP_FRAME_WIDTH, width)
     webcam.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+    
+    # Constants
     sequence, sentence, predictions = [], [], []
     threshold = 0.5
+    zoom_out_factor = 0.6  
 
+    # Mobile device videos will have a rotation value attached to the metadata
+    rotation_value = check_rotation(video)
 
     with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
         frame_count = 0
@@ -74,48 +90,52 @@ def video_to_text(video):
 
             frame_count += 1
 
-            # Skip the first few frames for 
+            # Skip the first few frames, might be the user setting up 
             if frame_count <= 5:
                 continue
+            
+            # Check if rotation is applied 
+            if rotation_value:
+                # Rotate 90 degrees clockwise
+                frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
 
             # Process frame
-            image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            results = holistic.process(image_rgb)
-            draw_landmarks(frame, results, mp_holistic, mp_drawings)
+            image, results = mp_detect(frame, holistic)
+            draw_landmarks(image, results, mp_holistic, mp_drawings)
 
             # Extract keypoints
             keypoints = extract_landmarks(results)
             sequence.append(keypoints)
             sequence = sequence[-30:]
             
-            text = "Awaiting Gesture..."
+            # Zoom out video to fit screen
+            image = cv2.resize(image, None, fx=zoom_out_factor, fy=zoom_out_factor, interpolation=cv2.INTER_LINEAR)
+            
             # Prediction logic
             if len(sequence) == 30:
                 res = model.predict(np.expand_dims(sequence, axis=0))[0]
                 pred_index = np.argmax(res)
-                text = actions[pred_index]
                 predictions.append(pred_index)
 
                 # Smoothing, make sure last 10 predictions all match and that the prediction % is past the threshhold
                 if np.unique(predictions[-10:])[0] == pred_index and res[pred_index] > threshold:
-                    
                     if not sentence or actions[pred_index] != sentence[-1]:
                         sentence.append(actions[pred_index])
                     
                     if len(sentence) > 7:
                         sentence = sentence[-8:]
 
-                frame = prob_viz(res, actions, frame, colors)
+                image = prob_viz(res, actions, image, colors)
 
-            cv2.rectangle(frame, (0,0), (width, 40), (245, 117, 16), -1)
-            cv2.putText(frame, ' '.join(sentence), (3,30), 
+            cv2.rectangle(image, (0,0), (1280, 40), (245, 117, 16), -1)
+            cv2.putText(image, ' '.join(sentence), (3,30), 
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-
+            
             # Show window
-            cv2.imshow('Hand Tracking', frame)
+            cv2.imshow('Hand Tracking', image)
 
             # Exit conditions
-            if cv2.waitKey(1) == ord('q'):
+            if cv2.waitKey(33) == ord('q'):
                 break
             if cv2.getWindowProperty('Hand Tracking', cv2.WND_PROP_VISIBLE) < 1:
                 break
