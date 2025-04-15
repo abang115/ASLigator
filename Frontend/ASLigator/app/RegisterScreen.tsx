@@ -72,17 +72,17 @@ export default function RegisterScreen() {
     <KeyboardAvoidingView style={styles.container} behavior='padding'>
 
       {/* Back Button */}
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton} testID='back'>
         <Ionicons name="arrow-back" size={30} color="#33418b" />
       </TouchableOpacity>
 
       {/* Screen Header */}
-      <Text style={styles.headerText}>Register</Text>
+      <Text style={styles.headerText} testID='header'>Register</Text>
 
       {/* Navigate to Login Screen */}
       <View style={styles.loginContainer}>
         <Text style={styles.loginText}>Already have an account? </Text>
-        <TouchableOpacity onPress={() => router.navigate("/LoginScreen")}>
+        <TouchableOpacity onPress={() => router.navigate("/LoginScreen")} testID='login'>
           <Text style={styles.loginLink}>Log In!</Text>
         </TouchableOpacity>
       </View>
@@ -90,17 +90,17 @@ export default function RegisterScreen() {
       {/* Input Form */}
       <View style={styles.inputContainer}>
         {/* InputField requiring first name  */}
-        <InputField control={control} name="firstName" label="First Name" placeholder="Ex: Jane"
+        <InputField control={control} name="firstName" label="First Name" placeholder="Ex: Jane" testID='first'
           rules={{ required: "First name is required." }}
         />
 
         {/* InputField requiring last name  */}
-        <InputField control={control} name="lastName" label="Last Name" placeholder="Ex: Doe"
+        <InputField control={control} name="lastName" label="Last Name" placeholder="Ex: Doe" testID='last'
           rules={{ required: "Last name is required." }}
         />
 
         {/* InputField with regex email validation */}
-        <InputField control={control} name="email" label="Email" placeholder="example@email.com"
+        <InputField control={control} name="email" label="Email" placeholder="example@email.com" testID='email'
           rules={{ 
             required: "Email is required.", 
             pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: "Invalid email address." } 
@@ -108,7 +108,7 @@ export default function RegisterScreen() {
         />
 
         {/* InputField with minimum length of 6 to meet Firebase password requirement */}
-        <InputField control={control} name="password" label="Password" placeholder="Minimum 6 characters" secureTextEntry
+        <InputField control={control} name="password" label="Password" placeholder="Minimum 6 characters" secureTextEntry testID='password'
           rules={{ 
             required: "Password is required.",
             minLength: { value: 6, message: "Minimum 6 characters required." } 
@@ -116,7 +116,7 @@ export default function RegisterScreen() {
         />
 
         {/* InputField requiring passwords to match */}
-        <InputField control={control} name="confirmPassword" label="Confirm Password" placeholder="Re-enter password" secureTextEntry
+        <InputField control={control} name="confirmPassword" label="Confirm Password" placeholder="Re-enter password" secureTextEntry testID='confirm'
           rules={{
             required: "Please confirm your password.",
             validate: (value: string) =>
@@ -127,9 +127,7 @@ export default function RegisterScreen() {
 
       {/* Register Button */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          onPress={ handleSubmit(register) }
-          style={styles.button}          >
+        <TouchableOpacity onPress={handleSubmit(register)} style={styles.button} testID='registerButton'>
         <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
       </View>
