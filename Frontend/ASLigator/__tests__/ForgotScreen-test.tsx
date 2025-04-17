@@ -23,8 +23,8 @@ describe('<ForgotScreen/>', () => {
     expect(getByTestId('reset')).toBeTruthy();
   });
   
-  // Test if able to successfully go back to home screen
-  test('Successfully navigate back to splash screen', async () => {
+  // Test if able to successfully go back to login screen
+  test('Successfully navigate back to login screen', async () => {
     const { getByTestId } = render(<ForgotScreen />);
 
     fireEvent.press(getByTestId('back'))

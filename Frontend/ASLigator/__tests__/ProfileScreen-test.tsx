@@ -46,7 +46,7 @@ describe('<ProfileScreen/>', () => {
   });
 
   // Test if able to successfully interact with image picker
-  test('Successfully sign out', async () => {
+  test('Successfully interact with image picker', async () => {
     const { getByTestId } = render(<ProfileScreen />);
 
     fireEvent.press(getByTestId('profile'))
