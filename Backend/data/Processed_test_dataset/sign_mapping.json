@@ -1,8 +1,12 @@
 {
-    "Good": 0,
-    "Hello": 1,
-    "Hungry": 2,
-    "I am": 3,
-    "Tired": 4,
-    "_": 5
+    "Dog": 0,
+    "Good": 1,
+    "Have": 2,
+    "Hello": 3,
+    "Hungry": 4,
+    "I am": 5,
+    "Pet": 6,
+    "Tired": 7,
+    "You": 8,
+    "_": 9
 }
