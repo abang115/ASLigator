@@ -8,7 +8,10 @@ def load_gloss(csv_file):
 def gloss_to_english(word_list, glossary):
     translated_words = []
     for word in word_list:
-        translation = glossary.get(word.lower(), word)
+        if word == "_":
+            continue
+        else:
+            translation = glossary.get(word.lower(), word)
         translated_words.append(translation)
     return translated_words
 
@@ -47,7 +50,7 @@ def reorder_sentence(words):
 def main():
     csv_file = 'dictionary.csv'
     glossary = load_gloss(csv_file)
-    asl_words = ["I", "now", "go", "store"]
+    asl_words = ["I", "_", "go", "home"]
     english_translation = gloss_to_english(asl_words, glossary)
     english_with_aux = reformat(english_translation)
     reordered = reorder_sentence(english_with_aux)
