@@ -36,8 +36,8 @@ describe('<SettingsScreen/>', () => {
     });
   });
 
-  // Test if able to successfully interact with picker objects
-  test('Successfully interact with picker', async () => {
+  // Test if able to successfully interact with picker and slider objects
+  test('Successfully interact with picker and slider', async () => {
     const { getByTestId } = render(<SettingsScreen />);
 
     fireEvent(getByTestId('voiceChange'), 'valueChange', 'en-gb-x-rjs-network')
