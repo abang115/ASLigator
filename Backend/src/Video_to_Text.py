@@ -11,7 +11,7 @@ root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(root_path)
 
 from data.helper import draw_landmarks, extract_landmarks, mp_detect
-
+from glossing import gloss
 def load_trained_model():
     # Load pre-trained model
     model_path = os.path.join(os.getcwd(), '..', 'model', 'model.keras')
@@ -142,4 +142,5 @@ def video_to_text(video):
 
     webcam.release()
     cv2.destroyAllWindows()
+    sentence = gloss(sentence)
     return sentence

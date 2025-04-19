@@ -47,14 +47,10 @@ def reorder_sentence(words):
             other.append(word)
     return final_string.join(greeting + sub + verb + other + end_words)
 
-def main():
+def gloss(sentence):
     csv_file = 'dictionary.csv'
     glossary = load_gloss(csv_file)
-    asl_words = ["I", "_", "go", "home"]
-    english_translation = gloss_to_english(asl_words, glossary)
+    english_translation = gloss_to_english(sentence, glossary)
     english_with_aux = reformat(english_translation)
     reordered = reorder_sentence(english_with_aux)
-    print("Sentence:", reordered)
-
-if __name__ == '__main__':
-    main()
+    return reordered
