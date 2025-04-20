@@ -11,7 +11,8 @@ root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(root_path)
 
 from data.helper import draw_landmarks, extract_landmarks, mp_detect
-from glossing import gloss
+from src.glossing import gloss
+
 def load_trained_model():
     # Load pre-trained model
     model_path = os.path.join(os.getcwd(), '..', 'model', 'model.keras')
@@ -121,9 +122,6 @@ def video_to_text(video):
                 if np.unique(predictions[-10:])[0] == pred_index and res[pred_index] > threshold:
                     if not sentence or actions[pred_index] != sentence[-1]:
                         sentence.append(actions[pred_index])
-                    
-                    if len(sentence) > 7:
-                        sentence = sentence[-8:]
 
                 image = prob_viz(res, actions, image, colors)
 

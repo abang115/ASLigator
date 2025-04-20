@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 
 def load_gloss(csv_file):
     glossary_df = pd.read_csv(csv_file)
@@ -27,7 +28,6 @@ def reformat(words):
     return new_words
 
 def reorder_sentence(words):
-    final_string = " "
     greeting = []
     sub = []
     verb = []
@@ -45,10 +45,10 @@ def reorder_sentence(words):
             end_words.append(word)
         else:
             other.append(word)
-    return final_string.join(greeting + sub + verb + other + end_words)
+    return greeting + sub + verb + other + end_words
 
 def gloss(sentence):
-    csv_file = 'dictionary.csv'
+    csv_file = os.path.join(os.getcwd(), '..', 'src', 'dictionary.csv')
     glossary = load_gloss(csv_file)
     english_translation = gloss_to_english(sentence, glossary)
     english_with_aux = reformat(english_translation)
