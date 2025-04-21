@@ -3,17 +3,14 @@ import os
 
 def load_gloss(csv_file):
     glossary_df = pd.read_csv(csv_file)
-    glossary = {row['asl'].strip().lower(): row['english'].strip() for index, row in glossary_df.iterrows()}
-    return glossary
+    return {row['asl'].strip().lower(): row['english'].strip() for index, row in glossary_df.iterrows()}
 
 def gloss_to_english(word_list, glossary):
     translated_words = []
     for word in word_list:
         if word == "_":
             continue
-        else:
-            translation = glossary.get(word.lower(), word)
-        translated_words.append(translation)
+        translated_words.append(glossary.get(word.lower(), word))
     return translated_words
 
 def reformat(words):
@@ -47,10 +44,27 @@ def reorder_sentence(words):
             other.append(word)
     return greeting + sub + verb + other + end_words
 
+def transform_question(words):
+    pronouns = {"i", "you", "he", "she", "we", "they", "me", "us", "him", "her", "them"}
+    if len(words) == 3 and words[-1].lower() in pronouns:
+        pronoun = words[-1].capitalize()
+        verb = words[0].lower()
+        noun = words[1].lower()
+        return ["Do", pronoun, verb, "a", noun + "?"]
+    return None
+
 def gloss(sentence):
     csv_file = os.path.join(os.getcwd(), '..', 'src', 'dictionary.csv')
     glossary = load_gloss(csv_file)
     english_translation = gloss_to_english(sentence, glossary)
     english_with_aux = reformat(english_translation)
     reordered = reorder_sentence(english_with_aux)
-    return reordered
+    question = transform_question(reordered)
+    return question if question is not None else reordered
+
+# def test_gloss():
+#     result = gloss(["have", "car", "you"])
+#     print("Test 'have pet you' =>", " ".join(result))
+
+# if __name__ == '__main__':
+#     test_gloss()
