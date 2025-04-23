@@ -97,12 +97,12 @@ export default function ProfileScreen() {
      <KeyboardAvoidingView style={styles.container} behavior='padding'>
 
       {/* Back Button */}
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton} testID='back'>
         <Ionicons name="arrow-back" size={30} color="#33418b" />
       </TouchableOpacity>
 
       {/* Profile Picture */}
-      <TouchableOpacity onPress={pickImage} style={styles.imageWrapper}>
+      <TouchableOpacity onPress={pickImage} style={styles.imageWrapper} testID='profile'>
         <View style={styles.imageContainer}>
           {image ? (
             <Image source={{ uri: image }} style={styles.profileImage} />
@@ -118,13 +118,13 @@ export default function ProfileScreen() {
       </TouchableOpacity>
 
       {/* User Information */}
-      <Text style={styles.headerText}>Profile</Text>
-      <Text style={styles.profileText}>First Name: {userData.firstName}</Text>
-      <Text style={styles.profileText}>Last Name: {userData.lastName}</Text>
-      <Text style={styles.profileText}>Email: {userData.email}</Text>
+      <Text style={styles.headerText} testID='header'>Profile</Text>
+      <Text style={styles.profileText} testID='first'>First Name: {userData.firstName}</Text>
+      <Text style={styles.profileText} testID='last'>Last Name: {userData.lastName}</Text>
+      <Text style={styles.profileText} testID='email'>Email: {userData.email}</Text>
 
       {/* Sign Out Button */}
-      <TouchableOpacity onPress={signOutUser} style={styles.button}>
+      <TouchableOpacity onPress={signOutUser} style={styles.button} testID='signOut'>
         <Text style={styles.buttonText}>Sign Out</Text>
       </TouchableOpacity>
      </KeyboardAvoidingView>

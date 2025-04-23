@@ -51,6 +51,9 @@ export default function RegisterScreen() {
             lastName: data.lastName,
             email: data.email,
             profilePicture: "",
+            voiceSetting: "en-au-x-aub-network",
+            speedSetting: 1,
+            pitchSetting: 1,
             createdAt: serverTimestamp(),
           });
           // Navigate to Home Screen

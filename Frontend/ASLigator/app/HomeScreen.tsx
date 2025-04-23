@@ -1,6 +1,6 @@
 import { CameraView, CameraType, useCameraPermissions, useMicrophonePermissions } from 'expo-camera'
 import { useState, useRef, useCallback } from 'react'
-import { Button, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import axios from 'axios'
@@ -77,8 +77,12 @@ export default function HomeScreen() {
     return (
       <View style={styles.container}>
         <Text style={styles.message}>We need your permission to access the camera and microphone</Text>
-        <Button onPress={requestCamPermission} title="Grant Camera Permission" />
-        <Button onPress={requestMicPermission} title="Grant Microphone Permission" />
+        <TouchableOpacity style={styles.permissionButton} onPress={requestCamPermission}>
+          <Text style={styles.buttonText}>Grant Camera Permission</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.permissionButton} onPress={requestMicPermission}>
+          <Text style={styles.buttonText}>Grant Microphone Permission</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -174,6 +178,8 @@ export default function HomeScreen() {
         facing={facing}
         testID='camera'
         zoom={0}
+        videoQuality='720p'
+        ratio='16:9'
        >
         {/* Recording Button */}
         <View style={styles.buttonContainer}>
@@ -196,7 +202,8 @@ export default function HomeScreen() {
           multiline={true}
           textAlignVertical="top"
           value={translatedText}
-          editable={false}
+          //editable={false}
+          onChangeText={setTranslatedText}
           testID='text'
         />
 
@@ -222,13 +229,13 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
-    width: '90%',
-    height: '70%',
+    width: '100%',
     borderRadius: 10,
     borderWidth: 2,
     overflow: 'hidden',
     marginTop: 55,
     borderColor: "#33418b",
+    aspectRatio: 9 / 16
   },
   buttonContainer: {
     flex: 1,
@@ -248,7 +255,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: '90%',
-    height: '20%',
+    height: '15%',
     borderWidth: 2,
     borderRadius: 10,
     marginTop: 10,
@@ -295,5 +302,18 @@ const styles = StyleSheet.create({
     right: 10,
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  permissionButton: {
+    backgroundColor: "#33418b",
+    alignItems: "center",
+    width: "60%",
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: '700',
+    fontSize: 16,
   },
 });
