@@ -3,7 +3,7 @@ import React, {useState, useEffect} from 'react'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
-import { getFirestore, doc, updateDoc, getDoc } from "@react-native-firebase/firestore"
+import { getFirestore, doc, setDoc, getDoc } from "@react-native-firebase/firestore"
 import { getAuth } from "@react-native-firebase/auth"
 import Slider from '@react-native-community/slider';
  
@@ -40,7 +40,7 @@ export default function SettingsScreen() {
     const userId = auth.currentUser?.uid;
       if (userId) {
         const userDocRef = doc(firestore, "users", userId);
-        await updateDoc(userDocRef, { voiceSetting: voice });
+        await setDoc(userDocRef, { voiceSetting: voice }, { merge: true });
     }
   };
 
@@ -50,7 +50,7 @@ export default function SettingsScreen() {
     const userId = auth.currentUser?.uid;
       if (userId) {
         const userDocRef = doc(firestore, "users", userId);
-        await updateDoc(userDocRef, { speedSetting: speed });
+        await setDoc(userDocRef, { speedSetting: speed }, { merge: true });
     }
   };
 
@@ -60,7 +60,7 @@ export default function SettingsScreen() {
     const userId = auth.currentUser?.uid;
       if (userId) {
         const userDocRef = doc(firestore, "users", userId);
-        await updateDoc(userDocRef, { pitchSetting: pitch });
+        await setDoc(userDocRef, { pitchSetting: pitch }, { merge: true });
     }
   };
 

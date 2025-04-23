@@ -1,6 +1,6 @@
 import { CameraView, CameraType, useCameraPermissions, useMicrophonePermissions } from 'expo-camera'
 import { useState, useRef, useCallback } from 'react'
-import { Button, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import axios from 'axios'
@@ -202,7 +202,8 @@ export default function HomeScreen() {
           multiline={true}
           textAlignVertical="top"
           value={translatedText}
-          editable={false}
+          //editable={false}
+          onChangeText={setTranslatedText}
           testID='text'
         />
 
