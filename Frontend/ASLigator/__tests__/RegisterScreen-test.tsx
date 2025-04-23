@@ -3,12 +3,12 @@ import { mockBack, mockNav } from '../__mocks__/ExpoMocks';
 import '../__mocks__/FirebaseMocks'
 
 import RegisterScreen from '@/app/RegisterScreen';
-import { createUserWithEmailAndPassword } from '@react-native-firebase/auth';
+import { mockCreateUser } from '../__mocks__/FirebaseMocks';
 
 describe('<RegisterScreen/>', () => {
   // Reset navigation before each test
   beforeEach(() => {
-    mockNav.mockReset();
+    jest.clearAllMocks()
   });
 
   // Test if components are rendering correctly
@@ -70,7 +70,7 @@ describe('<RegisterScreen/>', () => {
     fireEvent.press(getByTestId('registerButton'))
   
     await waitFor(() => {
-        expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
+        expect(mockCreateUser).toHaveBeenCalledWith(
           expect.anything(),
           "test@example.com",
           "password123"
@@ -81,7 +81,7 @@ describe('<RegisterScreen/>', () => {
   });
 
   // Test if register fails when no text is entered and proper error messages are displayed
-  test('Successfully register and navigate to home screen', async () => {
+  test('Fail to register if nothing entered', async () => {
     const { getByTestId, findByText } = render(<RegisterScreen />);
 
     fireEvent.press(getByTestId('registerButton'));
@@ -97,7 +97,7 @@ describe('<RegisterScreen/>', () => {
   });
 
   // Test if register fails when email format is incorrect
-  test('Fail to login on incorrect email format', async () => {
+  test('Fail to register on incorrect email format', async () => {
     const { getByTestId, findByText } = render(<RegisterScreen />);
   
     fireEvent.changeText(getByTestId('first'), "testing");
@@ -124,7 +124,7 @@ describe('<RegisterScreen/>', () => {
   });
 
   // Test if register fails when password less than 6 characters is entered
-  test('Fail to login on incorrect password format', async () => {
+  test('Fail to register on incorrect password format', async () => {
     const { getByTestId, findByText } = render(<RegisterScreen />);
 
     fireEvent.changeText(getByTestId('first'), "testing");
@@ -151,7 +151,7 @@ describe('<RegisterScreen/>', () => {
   });
 
   // Test if register fails when passwords do not match
-  test('Fail to login on incorrect password format', async () => {
+  test('Fail to register if non-matching passwords', async () => {
     const { getByTestId, findByText } = render(<RegisterScreen />);
 
     fireEvent.changeText(getByTestId('first'), "testing");

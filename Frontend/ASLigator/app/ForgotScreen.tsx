@@ -44,7 +44,7 @@ export default function ForgotScreen() {
     <KeyboardAvoidingView style={styles.container} behavior='padding'>
 
       {/* Back Button */}
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton} testID='back'>
           <Ionicons name="arrow-back" size={30} color="#33418b" />
       </TouchableOpacity>
 
@@ -52,14 +52,14 @@ export default function ForgotScreen() {
       <Text style={styles.headerText} testID='header'>Forgot Password</Text>
 
       {/* Info Text */}
-      <Text style={styles.infoText}>
+      <Text style={styles.infoText} testID='info'>
         Please enter the email associated with your account and follow the instructions sent to reset your password.
       </Text>
 
       {/* Input Form */}
       <View style={styles.inputContainer}>
         {/* Custom InputField component with regex email validation */}
-        <InputField control={control} name="email" label="Email" placeholder="example@email.com"
+        <InputField control={control} name="email" label="Email" placeholder="example@email.com" testID='email'
           rules={{ 
             required: "Email is required.", 
             pattern: { value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: "Invalid email address." } 
@@ -69,12 +69,9 @@ export default function ForgotScreen() {
 
       {/* Reset Button */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          onPress={ handleSubmit(reset) }
-          style={styles.button}
-        >
-        <Text style={styles.buttonText}>Reset</Text>
-         </TouchableOpacity>
+        <TouchableOpacity onPress={ handleSubmit(reset) } style={styles.button} testID='reset'>
+          <Text style={styles.buttonText}>Reset</Text>
+        </TouchableOpacity>
       </View>
   
     </KeyboardAvoidingView>

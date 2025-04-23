@@ -4,11 +4,12 @@ import '../__mocks__/FirebaseMocks'
 import { signInWithEmailAndPassword } from '@react-native-firebase/auth';
 
 import LoginScreen from '@/app/LoginScreen';
+import { mockSignIn } from '../__mocks__/FirebaseMocks';
 
 describe('<LoginScreen/>', () => {
   // Reset navigation before each test
   beforeEach(() => {
-    mockNav.mockReset();
+    jest.clearAllMocks()
   });
 
   // Test if components are rendering correctly
@@ -76,6 +77,7 @@ describe('<LoginScreen/>', () => {
         "password123"
       );
 
+      expect(mockSignIn).toHaveBeenCalled();
       expect(mockNav).toHaveBeenCalledWith('/HomeScreen');
     });
   });

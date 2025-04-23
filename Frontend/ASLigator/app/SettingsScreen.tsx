@@ -3,13 +3,13 @@ import React, {useState, useEffect} from 'react'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
-import { getFirestore, doc, updateDoc, getDoc } from "@react-native-firebase/firestore"
+import { getFirestore, doc, setDoc, getDoc } from "@react-native-firebase/firestore"
 import { getAuth } from "@react-native-firebase/auth"
 import Slider from '@react-native-community/slider';
  
 export default function SettingsScreen() {
   const router = useRouter()
-  const [selectedVoice, setSelectedVoice] = useState("");
+  const [selectedVoice, setSelectedVoice] = useState("en-au-x-aub-network");
   const [selectedSpeed, setSelectedSpeed] = useState(1);
   const [selectedPitch, setSelectedPitch] = useState(1);
   const auth = getAuth()
@@ -40,7 +40,7 @@ export default function SettingsScreen() {
     const userId = auth.currentUser?.uid;
       if (userId) {
         const userDocRef = doc(firestore, "users", userId);
-        await updateDoc(userDocRef, { voiceSetting: voice });
+        await setDoc(userDocRef, { voiceSetting: voice }, { merge: true });
     }
   };
 
@@ -50,7 +50,7 @@ export default function SettingsScreen() {
     const userId = auth.currentUser?.uid;
       if (userId) {
         const userDocRef = doc(firestore, "users", userId);
-        await updateDoc(userDocRef, { speedSetting: speed });
+        await setDoc(userDocRef, { speedSetting: speed }, { merge: true });
     }
   };
 
@@ -60,7 +60,7 @@ export default function SettingsScreen() {
     const userId = auth.currentUser?.uid;
       if (userId) {
         const userDocRef = doc(firestore, "users", userId);
-        await updateDoc(userDocRef, { pitchSetting: pitch });
+        await setDoc(userDocRef, { pitchSetting: pitch }, { merge: true });
     }
   };
 
@@ -68,15 +68,15 @@ export default function SettingsScreen() {
     <KeyboardAvoidingView style={styles.container} behavior='padding'>
 
       {/* Back Button */}
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton} testID='back'>
         <Ionicons name="arrow-back" size={30} color="#33418b" />
       </TouchableOpacity>
 
       {/* Settings Screen Icon */}
-      <View style={styles.settingsIcon}>
+      <View style={styles.settingsIcon} testID='settingsIcon'>
         <Ionicons name="settings" size={100} color="white"/>
       </View>
-      <Text style={styles.headerText}>Settings</Text>
+      <Text style={styles.headerText} testID='header'>Settings</Text>
 
       {/* Voice Preference Dropdown */}
       <Text style={styles.label}>Voice Preference</Text>
@@ -85,6 +85,7 @@ export default function SettingsScreen() {
           selectedValue={selectedVoice}
           onValueChange={handleVoiceChange}
           style={styles.pickerStyle}
+          testID='voiceChange'
         >
           <Picker.Item label="Male Voice 1" value="en-au-x-aub-network"/>
           <Picker.Item label="Male Voice 2" value="en-gb-x-rjs-network"/>
@@ -100,6 +101,7 @@ export default function SettingsScreen() {
           selectedValue={selectedSpeed}
           onValueChange={handleSpeedChange}
           style={styles.pickerStyle}
+          testID='speedChange'
         >
           <Picker.Item label="Normal" value={1}/>
           <Picker.Item label="Fast" value={1.5}/>
@@ -119,6 +121,7 @@ export default function SettingsScreen() {
           minimumTrackTintColor="#33418b"
           maximumTrackTintColor="#000000"
           thumbTintColor='#33418b'
+          testID='pitchChange'
         />
       </View>
      </KeyboardAvoidingView>

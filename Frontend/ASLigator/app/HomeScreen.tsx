@@ -1,6 +1,6 @@
 import { CameraView, CameraType, useCameraPermissions, useMicrophonePermissions } from 'expo-camera'
 import { useState, useRef, useCallback } from 'react'
-import { Button, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import axios from 'axios'
@@ -77,8 +77,12 @@ export default function HomeScreen() {
     return (
       <View style={styles.container}>
         <Text style={styles.message}>We need your permission to access the camera and microphone</Text>
-        <Button onPress={requestCamPermission} title="Grant Camera Permission" />
-        <Button onPress={requestMicPermission} title="Grant Microphone Permission" />
+        <TouchableOpacity style={styles.permissionButton} onPress={requestCamPermission}>
+          <Text style={styles.buttonText}>Grant Camera Permission</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.permissionButton} onPress={requestMicPermission}>
+          <Text style={styles.buttonText}>Grant Microphone Permission</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -198,7 +202,8 @@ export default function HomeScreen() {
           multiline={true}
           textAlignVertical="top"
           value={translatedText}
-          editable={false}
+          //editable={false}
+          onChangeText={setTranslatedText}
           testID='text'
         />
 
@@ -297,5 +302,18 @@ const styles = StyleSheet.create({
     right: 10,
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  permissionButton: {
+    backgroundColor: "#33418b",
+    alignItems: "center",
+    width: "60%",
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: '700',
+    fontSize: 16,
   },
 });

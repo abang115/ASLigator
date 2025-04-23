@@ -1,7 +1,6 @@
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import { mockNav, mockRecordAsync, mockStopRecording } from '../__mocks__/ExpoMocks';
+import { mockNav, mockRecordAsync, mockStopRecording, mockSpeak } from '../__mocks__/ExpoMocks';
 import '../__mocks__/FirebaseMocks'
-import * as Speech from 'expo-speech';
 
 import HomeScreen from '@/app/HomeScreen';
 
@@ -13,7 +12,7 @@ describe('<HomeScreen/>', () => {
   });
 
   // Test if components are rendering correctly
-  test('Components renders correctly on Register', () => {
+  test('Components renders correctly on Home', () => {
       const { getByTestId } = render(<HomeScreen />);
 
       expect(getByTestId('settings')).toBeTruthy()
@@ -25,7 +24,7 @@ describe('<HomeScreen/>', () => {
   });
 
   // Test if able to successfully navigate to settings
-  test('Components renders correctly on Register', async () => {
+  test('Navigate to settings', async () => {
     const { getByTestId } = render(<HomeScreen />);
     
     fireEvent.press(getByTestId('settings'))
@@ -36,7 +35,7 @@ describe('<HomeScreen/>', () => {
   });
 
   // Test if able to successfully navigate to profile
-  test('Components renders correctly on Register', async () => {
+  test('Navigate to profile', async () => {
     const { getByTestId } = render(<HomeScreen />);
     
     fireEvent.press(getByTestId('profile'))
@@ -47,18 +46,18 @@ describe('<HomeScreen/>', () => {
   });
 
   // Test if pressing TTS button activates expo speech
-  test('Components renders correctly on Register', async () => {
+  test('Text-to-speech button calls function', async () => {
     const { getByTestId } = render(<HomeScreen />);
     
     fireEvent.press(getByTestId('speech'))
     
     await waitFor(() => {
-      expect(Speech.speak).toHaveBeenCalled();
+      expect(mockSpeak).toHaveBeenCalled();
     });
   });
 
   // Test if pressing start button activates recording
-  test('Components renders correctly on Register', async () => {
+  test('Camera is able to record', async () => {
     const { getByTestId } = render(<HomeScreen />);
 
     fireEvent.press(getByTestId('start'))
@@ -68,8 +67,8 @@ describe('<HomeScreen/>', () => {
     });
   });
 
-  // Test if pressing start button activates recording
-  test('Components renders correctly on Register', async () => {
+  // Test if pressing stop button stops recording
+  test('Camera is able to stop recording', async () => {
     const { getByTestId } = render(<HomeScreen />);
 
     fireEvent.press(getByTestId('start'))
